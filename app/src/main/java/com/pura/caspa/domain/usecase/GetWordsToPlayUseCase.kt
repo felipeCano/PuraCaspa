@@ -5,7 +5,7 @@ import com.pura.caspa.data.util.Resource
 import com.pura.caspa.domain.repository.PuraCaspaRepository
 
 class GetWordsToPlayUseCase(private val puraCaspaRepository: PuraCaspaRepository) {
-    suspend fun execute(): Resource<APIResponse>{
+    suspend fun execute(): Resource<List<APIResponse>> {
         return puraCaspaRepository.getWordstoPlay()
     }
 }

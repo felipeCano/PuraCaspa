@@ -5,5 +5,5 @@ import com.pura.caspa.data.util.Resource
 
 interface PuraCaspaRepository {
 
-    suspend fun getWordstoPlay(): Resource<APIResponse>
+    suspend fun getWordstoPlay(): Resource<List<APIResponse>>
 }

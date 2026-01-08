@@ -64,4 +64,8 @@ dependencies {
     implementation(libs.kotlinx.coroutines.play.services)
     // ViewModel para Android
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    // Import the BoM for the Firebase platform
+    implementation(platform(libs.firebase.bom))
+    // Cloud Firestore library
+    implementation(libs.firebase.firestore)
 }
