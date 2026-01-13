@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     kotlin("kapt")
+    alias(libs.plugins.google.dagger.hilt)
 }
 
 android {
@@ -77,6 +78,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.livedata.ktx)
     // Annotation processor
     kapt(libs.androidx.lifecycle.compiler)
+    //hilt
+    implementation(libs.google.dagger.hilt)
+    kapt(libs.google.dagger.hilt.compiler)
 }
 
 kapt {
