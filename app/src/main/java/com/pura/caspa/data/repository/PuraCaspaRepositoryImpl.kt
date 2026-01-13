@@ -14,7 +14,7 @@ class PuraCaspaRepositoryImpl(
             val data = puraCaspaRemoteDataSource.fetchWords()
             Resource.Success(data)
         } catch (e: Exception) {
-            Resource.Error(e.localizedMessage)
+            Resource.Error(e.message.toString())
         }
     }
 }

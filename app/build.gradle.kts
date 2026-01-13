@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    kotlin("kapt")
 }
 
 android {
@@ -68,4 +69,16 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     // Cloud Firestore library
     implementation(libs.firebase.firestore)
+    // ViewModel
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    // ViewModel utilities for Compose
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    // LiveData
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    // Annotation processor
+    kapt(libs.androidx.lifecycle.compiler)
+}
+
+kapt {
+    correctErrorTypes = true
 }
