@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     kotlin("kapt")
     alias(libs.plugins.google.dagger.hilt)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -81,6 +82,8 @@ dependencies {
     //hilt
     implementation(libs.google.dagger.hilt)
     kapt(libs.google.dagger.hilt.compiler)
+    //Compose + Hilt
+    implementation(libs.androidx.hilt.navigation.compose)
 }
 
 kapt {

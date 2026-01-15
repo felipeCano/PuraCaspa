@@ -2,7 +2,6 @@ package com.pura.caspa.presentation.viewmodel
 
 import android.app.Application
 import android.net.ConnectivityManager
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import android.content.Context
 import android.net.NetworkCapabilities
@@ -11,26 +10,36 @@ import androidx.lifecycle.AndroidViewModel
 import com.pura.caspa.data.model.APIResponse
 import com.pura.caspa.data.util.Resource
 import com.pura.caspa.domain.usecase.GetWordsToPlayUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class PuraCaspaViewModel(
+@HiltViewModel
+class PuraCaspaViewModel @Inject constructor(
     private val app: Application,
     val getWordsToPlayUseCase: GetWordsToPlayUseCase
 ) : AndroidViewModel(app) {
-    val puraCaspaGetWords: MutableLiveData<Resource<List<APIResponse>>> = MutableLiveData()
+    private val _state = MutableStateFlow<Resource<APIResponse>>(Resource.Loading())
+    val state: StateFlow<Resource<APIResponse>> = _state.asStateFlow()
 
+    init {
+        getWords()
+    }
     fun getWords() = viewModelScope.launch(Dispatchers.IO) {
-        puraCaspaGetWords.postValue(Resource.Loading())
+        _state.value = Resource.Loading()
         try {
             if (isNetworkAvailable(app)) {
-                val firestoreResult = getWordsToPlayUseCase.execute()
-                puraCaspaGetWords.postValue(firestoreResult)
+                val result = getWordsToPlayUseCase.execute()
+                _state.value = result
             } else {
-                puraCaspaGetWords.postValue(Resource.Error("Internet is not available"))
+                _state.value = Resource.Error("Internet is not available")
             }
         } catch (e:Exception){
-            puraCaspaGetWords.postValue(Resource.Error(e.message.toString()))
+            _state.value = Resource.Error(e.message ?: "Unknown Error")
         }
     }
 

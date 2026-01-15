@@ -4,5 +4,5 @@ import com.google.gson.annotations.SerializedName
 
 data class APIResponse (
     @SerializedName("words")
-    val words : List<Words>
+    val words: List<String> = emptyList()
 )

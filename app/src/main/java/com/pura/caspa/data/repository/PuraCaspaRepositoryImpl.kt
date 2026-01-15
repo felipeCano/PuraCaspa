@@ -9,7 +9,7 @@ class PuraCaspaRepositoryImpl(
     private val puraCaspaRemoteDataSource: PuraCaspaRemoteDataSource
 ):PuraCaspaRepository {
 
-    override suspend fun getWordstoPlay(): Resource<List<APIResponse>> {
+    override suspend fun getWordstoPlay(): Resource<APIResponse> {
         return try {
             val data = puraCaspaRemoteDataSource.fetchWords()
             Resource.Success(data)
