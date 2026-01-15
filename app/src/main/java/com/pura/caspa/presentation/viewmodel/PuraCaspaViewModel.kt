@@ -13,6 +13,8 @@ import com.pura.caspa.domain.usecase.GetWordsToPlayUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
@@ -41,12 +43,14 @@ class PuraCaspaViewModel @Inject constructor(
 //        }
 //    }
 
-    val state: StateFlow<Resource<Words>> = getWordsToPlayUseCase.execute()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = Resource.Loading()
-        )
+    val state: StateFlow<Resource<Words>> = flow {
+        val hasInternet = isNetworkAvailable(app)
+        emitAll(getWordsToPlayUseCase.execute(hasInternet))
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = Resource.Loading()
+    )
 
     private fun isNetworkAvailable(context: Context?): Boolean {
         if (context == null) return false
