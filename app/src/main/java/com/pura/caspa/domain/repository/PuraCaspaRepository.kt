@@ -1,9 +1,10 @@
 package com.pura.caspa.domain.repository
 
-import com.pura.caspa.data.model.APIResponse
+import com.pura.caspa.data.model.Words
 import com.pura.caspa.data.util.Resource
+import kotlinx.coroutines.flow.Flow
 
 interface PuraCaspaRepository {
 
-    suspend fun getWordstoPlay(): Resource<APIResponse>
+    fun getWordstoPlay(): Flow<Resource<Words>>
 }

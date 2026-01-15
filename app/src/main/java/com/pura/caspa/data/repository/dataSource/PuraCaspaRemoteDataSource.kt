@@ -1,7 +1,8 @@
 package com.pura.caspa.data.repository.dataSource
 
-import com.pura.caspa.data.model.APIResponse
+import com.pura.caspa.data.model.Words
+import kotlinx.coroutines.flow.Flow
 
 interface PuraCaspaRemoteDataSource {
-    suspend fun fetchWords(): APIResponse
+    fun fetchWords(): Flow<Words>
 }
