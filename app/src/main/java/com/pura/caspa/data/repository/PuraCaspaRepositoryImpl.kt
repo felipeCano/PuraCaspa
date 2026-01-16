@@ -13,15 +13,6 @@ class PuraCaspaRepositoryImpl(
     private val puraCaspaRemoteDataSource: PuraCaspaRemoteDataSource
 ):PuraCaspaRepository {
 
-//    override fun getWordstoPlay(): Flow<Resource<Words> {
-//        return try {
-//            val data = puraCaspaRemoteDataSource.fetchWords()
-//            Resource.Success(data)
-//        } catch (e: Exception) {
-//            Resource.Error(e.message.toString())
-//        }
-//    }
-
     override fun getWordstoPlay(): Flow<Resource<Words>> {
         return puraCaspaRemoteDataSource.fetchWords()
             .map { data ->

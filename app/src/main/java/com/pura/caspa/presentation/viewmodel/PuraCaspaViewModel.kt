@@ -23,25 +23,6 @@ class PuraCaspaViewModel @Inject constructor(
     private val app: Application,
     val getWordsToPlayUseCase: GetWordsToPlayUseCase
 ) : AndroidViewModel(app) {
-//    private val _state = MutableStateFlow<Resource<APIResponse>>(Resource.Loading())
-//    val state: StateFlow<Resource<APIResponse>> = _state.asStateFlow()
-//
-//    init {
-//        getWords()
-//    }
-//    fun getWords() = viewModelScope.launch(Dispatchers.IO) {
-//        _state.value = Resource.Loading()
-//        try {
-//            if (isNetworkAvailable(app)) {
-//                val result = getWordsToPlayUseCase.execute()
-//                _state.value = result
-//            } else {
-//                _state.value = Resource.Error("Internet is not available")
-//            }
-//        } catch (e:Exception){
-//            _state.value = Resource.Error(e.message ?: "Unknown Error")
-//        }
-//    }
 
     val state: StateFlow<Resource<Words>> = flow {
         val hasInternet = isNetworkAvailable(app)
