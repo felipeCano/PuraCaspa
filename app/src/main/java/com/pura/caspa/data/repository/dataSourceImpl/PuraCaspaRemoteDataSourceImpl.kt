@@ -8,15 +8,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
 class PuraCaspaRemoteDataSourceImpl(private val db: FirebaseFirestore) : PuraCaspaRemoteDataSource {
-//    override suspend fun fetchWords(): Flow<Words> {
-//        //Target the collection "Words" and the document "Words"
-//        val snapshot = db.collection("Words")
-//            .document("Words")
-//            .get()
-//            .await()
-//        //Convert the document to a class APIResponse
-//        return snapshot.toObject(APIResponse::class.java) ?: APIResponse()
-//    }
 
     override fun fetchWords(): Flow<Words> = callbackFlow {
         val docRef = db.collection("Words").document("Words")
