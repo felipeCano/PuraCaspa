@@ -15,9 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pura.caspa.compose.AppNavHost
 import com.pura.caspa.data.util.Resource
 import com.pura.caspa.presentation.viewmodel.PuraCaspaViewModel
 import com.pura.caspa.ui.theme.PuraCaspaTheme
@@ -31,7 +34,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             PuraCaspaTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    ListaProductosScreen(modifier = Modifier.padding(innerPadding))
+                    AppNavHost(modifier = Modifier.padding(innerPadding))
+                    //ListaProductosScreen(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
@@ -56,14 +60,21 @@ fun ListaProductosScreen(
             ) {
                 Text(
                     text = res.data!!.words,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 50.sp,
                     style = MaterialTheme.typography.displayLarge,
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.primary
+                    fontWeight = FontWeight.Bold
                 )
             }
         }
         is Resource.Error -> {
-            Text(text = "Error: ${res.message}")
+            Text(text = "Error: ${res.message}",
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = 30.sp,
+                style = MaterialTheme.typography.displayLarge,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold)
         }
     }
 }

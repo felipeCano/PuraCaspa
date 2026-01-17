@@ -43,7 +43,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -84,6 +83,8 @@ dependencies {
     kapt(libs.google.dagger.hilt.compiler)
     //Compose + Hilt
     implementation(libs.androidx.hilt.navigation.compose)
+    //Navigation Compose
+    implementation(libs.androidx.navigation.compose)
 }
 
 kapt {

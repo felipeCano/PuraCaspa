@@ -18,6 +18,7 @@ composeBom = "2024.09.00"
 lifecycleViewmodelKtx = "2.10.0"
 hilt = "2.51.1"
 googleServices = "4.4.2"
+navigationCompose = "2.9.6"
 
 
 [libraries]
@@ -27,6 +28,7 @@ androidx-lifecycle-compiler = { module = "androidx.lifecycle:lifecycle-compiler"
 androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleViewmodelKtx" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelKtx" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
