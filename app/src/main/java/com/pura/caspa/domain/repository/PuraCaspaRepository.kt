@@ -6,5 +6,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface PuraCaspaRepository {
 
+    //GetWordsToPlayUseCase
     fun getWordstoPlay(): Flow<Resource<Words>>
+    //SaveUserNameUseCase
+    fun saveUserName(name: String)
+    fun getUserName(): String
 }
