@@ -11,4 +11,6 @@ interface PuraCaspaRepository {
     //SaveUserNameUseCase
     fun saveUserName(name: String)
     fun getUserName(): String
+    //CreateParty
+    suspend fun createParty(customId: String): Resource<String>
 }

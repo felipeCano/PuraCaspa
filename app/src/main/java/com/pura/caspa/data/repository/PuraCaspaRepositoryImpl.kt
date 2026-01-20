@@ -1,6 +1,7 @@
 package com.pura.caspa.data.repository
 
 import com.pura.caspa.data.local.dataSource.UserPreferencesManager
+import com.pura.caspa.data.model.PartyData
 import com.pura.caspa.data.model.Words
 import com.pura.caspa.data.repository.dataSource.PuraCaspaRemoteDataSource
 import com.pura.caspa.data.util.Resource
@@ -24,6 +25,18 @@ class PuraCaspaRepositoryImpl(
             .catch { e -> emit(Resource.Error(e.message ?: "Error desconocido")) }
     }
 
+    //SaveUserNameUseCase
     override fun saveUserName(name: String) = userPreferencesManager.saveName(name)
     override fun getUserName(): String = userPreferencesManager.getName()
+
+    //CreatePartyUsesCases
+    override suspend fun createParty(customId: String): Resource<String> {
+        val userName = userPreferencesManager.getName() // El host es el usuario actual
+        val newRoom = PartyData(
+            host_id = userName,
+            integrantes = listOf(userName),
+            estado = "esperando"
+        )
+        return puraCaspaRemoteDataSource.createParty(customId, newRoom)
+    }
 }
