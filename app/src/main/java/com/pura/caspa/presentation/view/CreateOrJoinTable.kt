@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.pura.caspa.R
@@ -51,7 +52,7 @@ fun CreateOrJoinTable(
             TitleFrame()
             Spacer(modifier = Modifier.height(40.dp))
             Text(
-                text = "Nombre del jugador",
+                text = stringResource(id = R.string.name_player),
                 color = Color.LightGray,
                 modifier = Modifier.align(Alignment.Start).padding(start = 8.dp)
             )
@@ -59,7 +60,7 @@ fun CreateOrJoinTable(
             TextField(
                 value = nameState,
                 onValueChange = { viewModel.onNameChange(it) },
-                placeholder = { Text("Ej. Juan Pérez", color = Color.Gray) },
+                placeholder = { Text(text = stringResource(id = R.string.name_suggestion), color = Color.Gray) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
@@ -79,7 +80,7 @@ fun CreateOrJoinTable(
             Spacer(modifier = Modifier.height(32.dp))
 
             WoodButton(
-                text = "Crear Sala",
+                text = stringResource(id = R.string.create_table),
                 onClick = {
                     viewModel.saveName()
                     onNavigateToCreate()
@@ -87,7 +88,7 @@ fun CreateOrJoinTable(
             )
             Spacer(modifier = Modifier.height(24.dp))
             WoodButton(
-                text = "Unirse a la sala",
+                text = stringResource(id = R.string.join_the_room),
                 onClick = {/*Logica Pendiente*/}
             )
         }

@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">PuraCaspa</string>
+    <string name="name_player">Player Name</string>
+    <string name="name_suggestion">e.g., Juan Perez</string>
+    <string name="create_table">Create Party</string>
+    <string name="join_the_room">Join the party</string>
+    <string name="welcome_to_puracaspa">Welcome to Pura Caspa</string>
 </resources>

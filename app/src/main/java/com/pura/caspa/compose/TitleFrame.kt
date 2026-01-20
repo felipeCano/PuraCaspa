@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,7 +23,7 @@ fun TitleFrame(){
         border = BorderStroke(2.dp, Color(0xFF8B5E3C))
     ) {
         Text(
-            text = "Bienvenidos a Pura Caspa",
+            text = stringResource(id= R.string.welcome_to_puracaspa),
             modifier = Modifier.padding(horizontal = 38.dp, vertical = 8.dp),
             color = Color.White,
             fontWeight = FontWeight.Bold,

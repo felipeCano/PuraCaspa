@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PuraCaspa</string>
+    <string name="name_player">Nombre del jugador</string>
+    <string name="name_suggestion">Ej. Juan Perez</string>
+    <string name="create_table">Crear Sala</string>
+    <string name="join_the_room">Unirse a la sala</string>
+    <string name="welcome_to_puracaspa">Bienvenidos a Pura Caspa</string>
+</resources>
