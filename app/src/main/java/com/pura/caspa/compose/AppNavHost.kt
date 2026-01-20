@@ -6,7 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.pura.caspa.presentation.view.CreateOrJoinTable
-import com.pura.caspa.presentation.view.CreateTable
+import com.pura.caspa.presentation.view.ConfirmTableCreation
 import androidx.compose.ui.Modifier
 
 @Composable
@@ -19,13 +19,13 @@ fun AppNavHost(
         startDestination = "create_or_join_table"
     ){
         composable (route = "create_or_join_table"){
-            CreateOrJoinTable(onNavigateToCreate = {
-                navController.navigate("create_table")
+            CreateOrJoinTable(onNavigateToConfirmTableCreation = {
+                navController.navigate("confirm_table_creation")
             },modifier)
 
         }
-        composable (route = "create_table"){
-            CreateTable(modifier)
+        composable (route = "confirm_table_creation"){
+            ConfirmTableCreation(modifier)
         }
     }
 }

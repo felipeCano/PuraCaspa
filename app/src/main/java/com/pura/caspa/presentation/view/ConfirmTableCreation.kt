@@ -14,29 +14,26 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.pura.caspa.R
 import com.pura.caspa.compose.BackgroundApp
 import com.pura.caspa.compose.TitleFrame
 import com.pura.caspa.compose.WoodButton
-import com.pura.caspa.presentation.viewmodel.UserNameViewModel
 
 @Composable
-fun CreateOrJoinTable(
-    onNavigateToConfirmTableCreation: () -> Unit,
-    modifier: Modifier = Modifier,
-    viewModel: UserNameViewModel = hiltViewModel()
-) {
-    val nameState by viewModel.nameState.collectAsState()
-
+fun ConfirmTableCreation(
+    modifier: Modifier = Modifier
+){
+    var idTableCreation by remember { mutableStateOf("") }
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -49,18 +46,10 @@ fun CreateOrJoinTable(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            TitleFrame()
-            Spacer(modifier = Modifier.height(40.dp))
-            Text(
-                text = stringResource(id = R.string.name_player),
-                color = Color.LightGray,
-                modifier = Modifier.align(Alignment.Start).padding(start = 8.dp)
-            )
 
             TextField(
-                value = nameState,
-                onValueChange = { viewModel.onNameChange(it) },
-                placeholder = { Text(text = stringResource(id = R.string.name_suggestion), color = Color.Gray) },
+                value = idTableCreation,
+                onValueChange = {textIdTable-> idTableCreation = textIdTable },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
@@ -79,16 +68,9 @@ fun CreateOrJoinTable(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            WoodButton(
-                text = stringResource(id = R.string.create_table),
-                onClick = {
-                    viewModel.saveName()
-                    onNavigateToConfirmTableCreation()
-                }
-            )
             Spacer(modifier = Modifier.height(24.dp))
             WoodButton(
-                text = stringResource(id = R.string.join_the_room),
+                text = stringResource(id = R.string.confirm_table_creation),
                 onClick = {/*Logica Pendiente*/}
             )
         }
