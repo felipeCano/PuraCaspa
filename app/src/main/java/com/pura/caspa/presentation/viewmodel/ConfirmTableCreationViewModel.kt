@@ -18,6 +18,7 @@ class ConfirmTableCreationViewModel @Inject constructor(
     val createPartyState = _createPartyState.asStateFlow()
 
     fun createNewRoom(roomName: String) {
+        _createPartyState.value = Resource.Loading()
         if (roomName.isBlank()) {
             _createPartyState.value = Resource.Error("El nombre de la sala no puede estar vacío")
             return

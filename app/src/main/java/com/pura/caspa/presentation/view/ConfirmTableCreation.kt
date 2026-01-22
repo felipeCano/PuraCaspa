@@ -37,7 +37,7 @@ import com.pura.caspa.presentation.viewmodel.ConfirmTableCreationViewModel
 fun ConfirmTableCreation(
     modifier: Modifier = Modifier,
     viewModel: ConfirmTableCreationViewModel = hiltViewModel()
-){
+) {
     var idTableCreation by remember { mutableStateOf("") }
     val state by viewModel.createPartyState.collectAsState()
 
@@ -56,11 +56,15 @@ fun ConfirmTableCreation(
 
             TextField(
                 value = idTableCreation,
-                onValueChange = {idTableCreation = it },
+                onValueChange = { idTableCreation = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
-                    .border(1.dp, colorResource(id = R.color.gold_border), RoundedCornerShape(12.dp)),
+                    .border(
+                        1.dp,
+                        colorResource(id = R.color.gold_border),
+                        RoundedCornerShape(12.dp)
+                    ),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = colorResource(id = R.color.input_background),
                     unfocusedContainerColor = colorResource(id = R.color.input_background),
@@ -78,17 +82,23 @@ fun ConfirmTableCreation(
             Spacer(modifier = Modifier.height(24.dp))
             WoodButton(
                 text = stringResource(id = R.string.confirm_table_creation),
-                onClick = {viewModel.createNewRoom(idTableCreation)}
+                onClick = { viewModel.createNewRoom(idTableCreation) }
             )
 
-            //Handle state
-            when (state) {
-                is Resource.Loading -> CircularProgressIndicator()
-                is Resource.Error -> Text(state.message ?: "Error", color = Color.Red)
-                is Resource.Success -> {
-                    Text("Sala '${state.data}' creada con éxito", color = Color.Green)
+            if (state.message != null || state.data != null) {
+                //Handle state
+                when (state) {
+                    is Resource.Loading -> {
+                        CircularProgressIndicator()
+                    }
+
+                    is Resource.Error -> Text(state.message ?: "Error", color = Color.Red)
+                    is Resource.Success -> {
+                        Text("Sala '${state.data}' creada con éxito", color = Color.Green)
+                    }
+
+                    else -> {}
                 }
-                else -> {}
             }
         }
     }
