@@ -35,8 +35,14 @@ class PuraCaspaRepositoryImpl(
         val newRoom = PartyData(
             host_id = userName,
             integrantes = listOf(userName),
-            estado = "esperando"
+            stateParty = "waiting"
         )
         return puraCaspaRemoteDataSource.createParty(customId, newRoom)
+    }
+
+    //JoinParty
+    override suspend fun joinParty(roomId: String): Resource<Unit> {
+        val userName = userPreferencesManager.getName() // Recuperamos el nombre guardado
+        return puraCaspaRemoteDataSource.joinParty(roomId, userName)
     }
 }

@@ -13,4 +13,6 @@ interface PuraCaspaRepository {
     fun getUserName(): String
     //CreateParty
     suspend fun createParty(customId: String): Resource<String>
+    //JoinParty
+    suspend fun joinParty(roomId: String): Resource<Unit>
 }

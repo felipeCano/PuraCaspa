@@ -9,4 +9,6 @@ interface PuraCaspaRemoteDataSource {
     fun fetchWords(): Flow<Words>
     //PartyData
     suspend fun createParty(customId: String, partyData: PartyData): Resource<String>
+    //JoinParty
+    suspend fun joinParty(roomId: String, userName: String): Resource<Unit>
 }

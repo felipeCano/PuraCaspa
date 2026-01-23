@@ -32,15 +32,16 @@ import com.pura.caspa.compose.BackgroundApp
 import com.pura.caspa.compose.WoodButton
 import com.pura.caspa.data.util.Resource
 import com.pura.caspa.presentation.viewmodel.ConfirmTableCreationViewModel
+import com.pura.caspa.presentation.viewmodel.JoinTableViewModel
 
 @Composable
-fun ConfirmTableCreation(
-    onNavigateToPuraCaspaGameView: (String) -> Unit,
+fun JoinTable(
+    onNavigateJoinToPuraCaspaGameView: (String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ConfirmTableCreationViewModel = hiltViewModel()
+    viewModel: JoinTableViewModel = hiltViewModel()
 ) {
-    var idTableCreation by remember { mutableStateOf("") }
-    val state by viewModel.createPartyState.collectAsState()
+    var roomIdInput by remember { mutableStateOf("") }
+    val state by viewModel.joinState.collectAsState()
 
     Box(
         modifier = modifier
@@ -56,8 +57,8 @@ fun ConfirmTableCreation(
         ) {
 
             TextField(
-                value = idTableCreation,
-                onValueChange = { idTableCreation = it },
+                value = roomIdInput,
+                onValueChange = { roomIdInput = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
@@ -82,9 +83,9 @@ fun ConfirmTableCreation(
 
             Spacer(modifier = Modifier.height(24.dp))
             WoodButton(
-                text = stringResource(id = R.string.confirm_table_creation),
+                text = stringResource(id = R.string.join_table),
                 onClick = {
-                    viewModel.createNewRoom(idTableCreation)
+                    viewModel.joinToRoom(roomIdInput)
                 }
             )
 
@@ -98,7 +99,7 @@ fun ConfirmTableCreation(
                     is Resource.Error -> Text(state.message ?: "Error", color = Color.Red)
                     is Resource.Success -> {
                         Text("Sala '${state.data}' creada con éxito", color = Color.Green)
-                        onNavigateToPuraCaspaGameView(idTableCreation)
+                        onNavigateJoinToPuraCaspaGameView(roomIdInput)
                     }
 
                     else -> {}

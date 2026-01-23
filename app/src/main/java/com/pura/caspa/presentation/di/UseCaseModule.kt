@@ -3,6 +3,7 @@ package com.pura.caspa.presentation.di
 import com.pura.caspa.domain.repository.PuraCaspaRepository
 import com.pura.caspa.domain.usecase.CreatePartyUseCase
 import com.pura.caspa.domain.usecase.GetWordsToPlayUseCase
+import com.pura.caspa.domain.usecase.JoinPartyUseCase
 import com.pura.caspa.domain.usecase.SaveUserNameUseCase
 import dagger.Module
 import dagger.Provides
@@ -36,5 +37,13 @@ class UseCaseModule {
         puraCaspaRepository: PuraCaspaRepository
     ): CreatePartyUseCase {
         return CreatePartyUseCase(puraCaspaRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun providePuraCaspaJoinPartyUseCase(
+        puraCaspaRepository: PuraCaspaRepository
+    ): JoinPartyUseCase {
+        return JoinPartyUseCase(puraCaspaRepository)
     }
 }

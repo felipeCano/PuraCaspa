@@ -3,7 +3,7 @@ package com.pura.caspa.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pura.caspa.data.util.Resource
-import com.pura.caspa.domain.repository.PuraCaspaRepository
+import com.pura.caspa.domain.usecase.CreatePartyUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ConfirmTableCreationViewModel @Inject constructor(
-    private val puraCaspaRepository: PuraCaspaRepository
+    private val createPartyUseCase: CreatePartyUseCase
 ) : ViewModel() {
     private val _createPartyState = MutableStateFlow<Resource<String>>(Resource.Loading())
     val createPartyState = _createPartyState.asStateFlow()
@@ -26,7 +26,7 @@ class ConfirmTableCreationViewModel @Inject constructor(
 
         viewModelScope.launch {
             _createPartyState.value = Resource.Loading()
-            _createPartyState.value = puraCaspaRepository.createParty(roomName)
+            _createPartyState.value = createPartyUseCase(roomName)
         }
     }
 }

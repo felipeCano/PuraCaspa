@@ -51,4 +51,35 @@ class PuraCaspaRemoteDataSourceImpl(private val db: FirebaseFirestore) : PuraCas
         }
     }
 
+    //JoinParty
+    override suspend fun joinParty(
+        roomId: String,
+        userName: String
+    ): Resource<Unit> {
+        return try {
+            val db = FirebaseFirestore.getInstance()
+            val roomRef = db.collection("salas").document(roomId)
+
+            db.runTransaction { transaction ->
+                val snapshot = transaction.get(roomRef)
+
+                if (!snapshot.exists()) {
+                    throw Exception("La sala no existe")
+                }
+
+                val integrantes = snapshot.get("integrantes") as? MutableList<String> ?: mutableListOf()
+
+                // Verificamos si ya está en la sala para no duplicarlo
+                if (!integrantes.contains(userName)) {
+                    integrantes.add(userName)
+                    transaction.update(roomRef, "integrantes", integrantes)
+                }
+            }.await()
+
+            Resource.Success(Unit)
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Error al unirse a la sala")
+        }
+    }
+
 }

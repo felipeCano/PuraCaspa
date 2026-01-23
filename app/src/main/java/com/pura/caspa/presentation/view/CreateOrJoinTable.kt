@@ -32,6 +32,7 @@ import com.pura.caspa.presentation.viewmodel.UserNameViewModel
 @Composable
 fun CreateOrJoinTable(
     onNavigateToConfirmTableCreation: () -> Unit,
+    onNavigatetoJoinTable: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: UserNameViewModel = hiltViewModel()
 ) {
@@ -89,7 +90,10 @@ fun CreateOrJoinTable(
             Spacer(modifier = Modifier.height(24.dp))
             WoodButton(
                 text = stringResource(id = R.string.join_the_room),
-                onClick = {/*Logica Pendiente*/}
+                onClick = {
+                    viewModel.saveName()
+                    onNavigatetoJoinTable()
+                }
             )
         }
     }
