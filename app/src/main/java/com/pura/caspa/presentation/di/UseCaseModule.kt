@@ -2,6 +2,8 @@ package com.pura.caspa.presentation.di
 
 import com.pura.caspa.domain.repository.PuraCaspaRepository
 import com.pura.caspa.domain.usecase.CreatePartyUseCase
+import com.pura.caspa.domain.usecase.GetPartyDataUseCase
+import com.pura.caspa.domain.usecase.GetUserNameUseCase
 import com.pura.caspa.domain.usecase.GetWordsToPlayUseCase
 import com.pura.caspa.domain.usecase.JoinPartyUseCase
 import com.pura.caspa.domain.usecase.SaveUserNameUseCase
@@ -45,5 +47,21 @@ class UseCaseModule {
         puraCaspaRepository: PuraCaspaRepository
     ): JoinPartyUseCase {
         return JoinPartyUseCase(puraCaspaRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun providePuraCaspaGetPartyDataUseCase(
+        puraCaspaRepository: PuraCaspaRepository
+    ): GetPartyDataUseCase {
+        return GetPartyDataUseCase(puraCaspaRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideGetUserNameUseCase(
+        repository: PuraCaspaRepository
+    ): GetUserNameUseCase {
+        return GetUserNameUseCase(repository)
     }
 }

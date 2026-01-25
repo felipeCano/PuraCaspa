@@ -82,4 +82,27 @@ class PuraCaspaRemoteDataSourceImpl(private val db: FirebaseFirestore) : PuraCas
         }
     }
 
+    //Listen PartyData
+    override fun getPartyData(roomId: String): Flow<Resource<PartyData>> = callbackFlow {
+        val roomRef = db.collection("salas").document(roomId)
+
+        // Listen in realTime our document
+        val subscription = roomRef.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                trySend(Resource.Error(error.message ?: "Error al escuchar sala"))
+                return@addSnapshotListener
+            }
+
+            if (snapshot != null && snapshot.exists()) {
+                val room = snapshot.toObject(PartyData::class.java)
+                if (room != null) {
+                    trySend(Resource.Success(room)) //Sent partyData updated
+                }
+            }
+        }
+
+        //Important: We close the listener when the Flow is no longer used
+        awaitClose { subscription.remove() }
+    }
+
 }

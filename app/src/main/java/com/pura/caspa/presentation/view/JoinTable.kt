@@ -31,7 +31,6 @@ import com.pura.caspa.R
 import com.pura.caspa.compose.BackgroundApp
 import com.pura.caspa.compose.WoodButton
 import com.pura.caspa.data.util.Resource
-import com.pura.caspa.presentation.viewmodel.ConfirmTableCreationViewModel
 import com.pura.caspa.presentation.viewmodel.JoinTableViewModel
 
 @Composable

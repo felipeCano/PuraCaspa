@@ -45,4 +45,10 @@ class PuraCaspaRepositoryImpl(
         val userName = userPreferencesManager.getName() // Recuperamos el nombre guardado
         return puraCaspaRemoteDataSource.joinParty(roomId, userName)
     }
+
+    //Listen PartyData
+    override fun getPartyData(roomId: String): Flow<Resource<PartyData>> {
+        //Repository delegates the real-time listening to the RemoteDataSource
+        return puraCaspaRemoteDataSource.getPartyData(roomId)
+    }
 }
