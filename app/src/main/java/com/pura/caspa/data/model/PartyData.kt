@@ -6,5 +6,6 @@ data class PartyData(
     val stateParty: String = "",
     val integrantes: List<String> = emptyList(),
     val palabra_actual: String = "",
-    val amoung_us : String = ""
+    val amoung_us : String = "",
+    val usedWords: List<String> = emptyList()
 )

@@ -99,4 +99,27 @@ class PuraCaspaRemoteDataSourceImpl(private val db: FirebaseFirestore) : PuraCas
         awaitClose { subscription.remove() }
     }
 
+    //Star Game
+    override suspend fun updatePartyStart(
+        roomId: String,
+        word: String,
+        impostor: String,
+        status: String,
+        newUsedWordsList: List<String>
+    ): Resource<Unit> {
+        return try {
+            //We update the specific fields in the room document
+            db.collection("salas").document(roomId)
+                .update(
+                    "palabra_actual", word,
+                    "amoung_us", impostor,
+                    "stateParty", status,
+                    "usedWords", newUsedWordsList
+                ).await()
+            Resource.Success(Unit)
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Error al actualizar la partida")
+        }
+    }
+
 }

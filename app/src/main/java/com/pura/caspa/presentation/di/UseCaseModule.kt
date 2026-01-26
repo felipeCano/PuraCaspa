@@ -7,6 +7,7 @@ import com.pura.caspa.domain.usecase.GetUserNameUseCase
 import com.pura.caspa.domain.usecase.GetWordsToPlayUseCase
 import com.pura.caspa.domain.usecase.JoinPartyUseCase
 import com.pura.caspa.domain.usecase.SaveUserNameUseCase
+import com.pura.caspa.domain.usecase.StartGameUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -60,8 +61,16 @@ class UseCaseModule {
     @Singleton
     @Provides
     fun provideGetUserNameUseCase(
-        repository: PuraCaspaRepository
+        puraCaspaRepository: PuraCaspaRepository
     ): GetUserNameUseCase {
-        return GetUserNameUseCase(repository)
+        return GetUserNameUseCase(puraCaspaRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideStarGameUseCase(
+        puraCaspaRepository: PuraCaspaRepository
+    ): StartGameUseCase {
+        return StartGameUseCase(puraCaspaRepository)
     }
 }

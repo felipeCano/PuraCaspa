@@ -48,4 +48,21 @@ class PuraCaspaRepositoryImpl(
         //Repository delegates the real-time listening to the RemoteDataSource
         return puraCaspaRemoteDataSource.getPartyData(roomId)
     }
+
+    //Star Game
+    override suspend fun updatePartyStart(
+        roomId: String,
+        word: String,
+        impostor: String,
+        status: String,
+        newUsedWordsList: List<String>
+    ): Resource<Unit> {
+        return puraCaspaRemoteDataSource.updatePartyStart(
+            roomId,
+            word,
+            impostor,
+            status,
+            newUsedWordsList
+        )
+    }
 }

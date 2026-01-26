@@ -9,13 +9,23 @@ interface PuraCaspaRepository {
 
     //GetWordsToPlayUseCase
     suspend fun getWordstoPlay(): Resource<Words>
+
     //SaveUserNameUseCase
     fun saveUserName(name: String)
     fun getUserName(): String
+
     //CreateParty
     suspend fun createParty(customId: String): Resource<String>
+
     //JoinParty
     suspend fun joinParty(roomId: String): Resource<Unit>
+
     //Listen PartyData
     fun getPartyData(roomId: String): Flow<Resource<PartyData>>
+
+    //StarGame
+    suspend fun updatePartyStart(
+        roomId: String, word: String, impostor: String, status: String,
+        newUsedWordsList: List<String>
+    ): Resource<Unit>
 }
