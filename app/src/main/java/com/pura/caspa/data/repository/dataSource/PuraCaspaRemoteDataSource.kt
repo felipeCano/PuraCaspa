@@ -6,7 +6,7 @@ import com.pura.caspa.data.util.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface PuraCaspaRemoteDataSource {
-    fun fetchWords(): Flow<Words>
+    suspend fun fetchWords(): Words
     //PartyData
     suspend fun createParty(customId: String, partyData: PartyData): Resource<String>
     //JoinParty

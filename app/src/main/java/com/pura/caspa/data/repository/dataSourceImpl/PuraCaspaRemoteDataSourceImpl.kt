@@ -12,19 +12,13 @@ import kotlinx.coroutines.tasks.await
 
 class PuraCaspaRemoteDataSourceImpl(private val db: FirebaseFirestore) : PuraCaspaRemoteDataSource {
 
-    override fun fetchWords(): Flow<Words> = callbackFlow {
-        val docRef = db.collection("Words").document("Words")
-        val subscription = docRef.addSnapshotListener { snapshot, error ->
-            if (error != null) {
-                close(error)
-                return@addSnapshotListener
-            }
-            if (snapshot != null && snapshot.exists()) {
-                val data = snapshot.toObject(Words::class.java)
-                data?.let { trySend(it) }
-            }
+    override suspend fun fetchWords(): Words {
+        return try {
+            val snapshot = db.collection("Words").document("Words").get().await()
+            snapshot.toObject(Words::class.java) ?: Words()
+        } catch (e: Exception) {
+            Words()
         }
-        awaitClose { subscription.remove() }
     }
 
     // Create Party Document

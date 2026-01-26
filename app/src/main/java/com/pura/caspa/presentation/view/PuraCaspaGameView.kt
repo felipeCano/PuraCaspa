@@ -1,5 +1,6 @@
 package com.pura.caspa.presentation.view
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,8 +27,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pura.caspa.data.util.Resource
 import com.pura.caspa.presentation.viewmodel.PuraCaspaGameViewModel
 
@@ -40,6 +44,8 @@ fun PuraCaspaGameView(
 ) {
     val roomState by viewModel.partyData.collectAsState()
     val myName by viewModel.currentUserName.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
 
     LaunchedEffect(key1 = nameTable) {
         viewModel.listenToRoom(nameTable)
@@ -125,6 +131,33 @@ fun PuraCaspaGameView(
                     color = Color.Red,
                     modifier = Modifier.align(Alignment.Center)
                 )
+            }
+
+            when (val res = state) {
+                is Resource.Loading -> {
+                    CircularProgressIndicator()
+                }
+                is Resource.Success -> {
+                    Box(
+                        modifier = modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        res.data!!.words.forEach {
+                            Log.d("MyTag", it)
+                        }
+                        Text(
+                            text = res.data.words.joinToString(" "),
+                            color = MaterialTheme.colorScheme.primary,
+                            fontSize = 50.sp,
+                            style = MaterialTheme.typography.displayLarge,
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+                is Resource.Error -> {
+                    Log.e("MyTag", "Error: ${res.message}")
+                }
             }
         }
     }
