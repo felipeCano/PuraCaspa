@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -26,9 +27,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pura.caspa.data.util.Resource
 import com.pura.caspa.presentation.viewmodel.PuraCaspaGameViewModel
 
@@ -51,8 +53,8 @@ fun PuraCaspaGameView(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Nombre de la Sala: $nameTable",
-                        style = MaterialTheme.typography.headlineMedium,
+                        text = "Sala: $nameTable",
+                        style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
                 },
@@ -63,91 +65,123 @@ fun PuraCaspaGameView(
             )
         }
     ) { paddingValues ->
-        Box(
+        Column(
             modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
-            contentAlignment = Alignment.TopCenter
+                .padding(horizontal = 20.dp, vertical = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             when (val state = roomState) {
                 is Resource.Success -> {
                     val partyData = state.data
                     val integrantes = partyData?.integrantes ?: emptyList()
+                    val isHost = partyData?.host_id == myName
 
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        contentAlignment = Alignment.Center
                     ) {
-                        if (partyData!!.stateParty == "jugando") {
-                            // We compare the saved name with the chosen one in Firebase
+                        if (partyData?.stateParty == "jugando") {
                             val isImpostor = partyData.amoung_us == myName
-
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                if (isImpostor) {
-                                    Text("¡ERES EL IMPOSTOR!", color = Color.Red, style = MaterialTheme.typography.bodySmall)
-                                    Text("No sabes la palabra. ¡Miente para sobrevivir!")
-                                } else {
-                                    Text("Tu palabra es:", style = MaterialTheme.typography.bodyMedium)
-                                    Text(
-                                        text = partyData.palabra_actual,
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        color = Color.Green
-                                    )
-                                }
-                            }
-                        }else{
-                            Text(
-                                "Jugadores conectados: ${integrantes.size}",
-                                style = MaterialTheme.typography.titleMedium
-                            )
 
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                                )
+                                shape = RoundedCornerShape(32.dp),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
+                                colors = CardDefaults.cardColors(containerColor = Color.White)
                             ) {
-                                Column(modifier = Modifier.padding(16.dp)) {
-                                    integrantes.forEach { nombre ->
-                                        Text("• $nombre", style = MaterialTheme.typography.bodyLarge)
+                                Column(
+                                    modifier = Modifier
+                                        .padding(vertical = 48.dp, horizontal = 16.dp)
+                                        .fillMaxWidth(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    if (isImpostor) {
+                                        Text(
+                                            text = "¡ERES EL",
+                                            color = Color.Red,
+                                            fontSize = 24.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Text(
+                                            text = "IMPOSTOR!",
+                                            color = Color.Red,
+                                            fontSize = 48.sp,
+                                            fontWeight = FontWeight.Black,
+                                            textAlign = TextAlign.Center
+                                        )
+                                        Spacer(modifier = Modifier.height(16.dp))
+                                        Text(
+                                            text = "Miente para sobrevivir",
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            color = Color.Gray
+                                        )
+                                    } else {
+                                        Text(
+                                            text = "Tu palabra es:",
+                                            fontSize = 18.sp,
+                                            color = Color.Gray,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                        Spacer(modifier = Modifier.height(12.dp))
+                                        Text(
+                                            text = partyData.palabra_actual,
+                                            // Bajamos un poco el tamaño base para evitar que "Sancocho" se rompa
+                                            // y usamos un estilo que permita ajustar el texto.
+                                            fontSize = 55.sp,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            color = Color(0xFF2E7D32),
+                                            textAlign = TextAlign.Center,
+                                            lineHeight = 60.sp,
+                                            softWrap = true, // Permite que baje, pero con mejor interlineado
+                                            maxLines = 2
+                                        )
                                     }
                                 }
                             }
-
-                            Spacer(modifier = Modifier.height(20.dp))
-
-                        }
-
-                        // Logic for the leader
-                        val isHost = partyData.host_id == myName
-                        if (isHost) {
-                            if (integrantes.size >= 2) {
-                                Button(
-                                    onClick = {
-                                        viewModel.onStartGameClicked(nameTable)
-                                    },
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Text("Iniciar Juego")
-                                }
-                            } else {
+                        } else {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
-                                    "Esperando a más jugadores...",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.secondary
+                                    "Esperando inicio...",
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    modifier = Modifier.padding(bottom = 20.dp)
                                 )
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(0.9f),
+                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                                ) {
+                                    Column(modifier = Modifier.padding(24.dp)) {
+                                        Text("Jugadores (${integrantes.size}):", fontWeight = FontWeight.Bold)
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        integrantes.forEach { Text("• $it", style = MaterialTheme.typography.bodyLarge) }
+                                    }
+                                }
                             }
                         }
                     }
+                    if (isHost) {
+                        Button(
+                            onClick = { viewModel.onStartGameClicked(nameTable) },
+                            enabled = integrantes.size >= 2,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(64.dp),
+                            shape = RoundedCornerShape(16.dp)
+                        ) {
+                            Text(
+                                text = if (partyData.stateParty == "waiting") "INICIAR JUEGO" else "SIGUIENTE PALABRA",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.ExtraBold
+                            )
+                        }
+                    }
                 }
-
-                is Resource.Loading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                is Resource.Error -> Text(
-                    text = state.message ?: "Error",
-                    color = Color.Red,
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                is Resource.Loading -> CircularProgressIndicator()
+                is Resource.Error -> Text("Error al cargar datos")
             }
         }
     }
