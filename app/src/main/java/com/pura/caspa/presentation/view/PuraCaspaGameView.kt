@@ -9,16 +9,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -31,6 +27,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.pura.caspa.compose.PuraCaspaButton
+import com.pura.caspa.compose.TitleFrame
 import com.pura.caspa.data.util.Resource
 import com.pura.caspa.presentation.viewmodel.PuraCaspaGameViewModel
 
@@ -48,23 +46,7 @@ fun PuraCaspaGameView(
         viewModel.listenToRoom(nameTable)
     }
 
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = "Sala: $nameTable",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            )
-        }
-    ) { paddingValues ->
+    TitleFrame("Sala: ", nameTable){ paddingValues ->
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -130,14 +112,12 @@ fun PuraCaspaGameView(
                                         Spacer(modifier = Modifier.height(12.dp))
                                         Text(
                                             text = partyData.palabra_actual,
-                                            // Bajamos un poco el tamaño base para evitar que "Sancocho" se rompa
-                                            // y usamos un estilo que permita ajustar el texto.
                                             fontSize = 55.sp,
                                             fontWeight = FontWeight.ExtraBold,
                                             color = Color(0xFF2E7D32),
                                             textAlign = TextAlign.Center,
                                             lineHeight = 60.sp,
-                                            softWrap = true, // Permite que baje, pero con mejor interlineado
+                                            softWrap = true,
                                             maxLines = 2
                                         )
                                     }
@@ -164,20 +144,14 @@ fun PuraCaspaGameView(
                         }
                     }
                     if (isHost) {
-                        Button(
+                        PuraCaspaButton(
+                            text = if (partyData.stateParty == "waiting") "INICIAR JUEGO" else "SIGUIENTE PALABRA",
                             onClick = { viewModel.onStartGameClicked(nameTable) },
                             enabled = integrantes.size >= 2,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(64.dp),
-                            shape = RoundedCornerShape(16.dp)
-                        ) {
-                            Text(
-                                text = if (partyData.stateParty == "waiting") "INICIAR JUEGO" else "SIGUIENTE PALABRA",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.ExtraBold
-                            )
-                        }
+                        )
                     }
                 }
                 is Resource.Loading -> CircularProgressIndicator()

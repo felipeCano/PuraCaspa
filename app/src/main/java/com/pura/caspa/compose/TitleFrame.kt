@@ -1,34 +1,39 @@
 package com.pura.caspa.compose
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.pura.caspa.R
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TitleFrame(){
-    Surface(
-        color = colorResource(id = R.color.gold_border),
-        shape = RoundedCornerShape(4.dp),
-        border = BorderStroke(2.dp, Color(0xFF8B5E3C))
-    ) {
-        Text(
-            text = stringResource(id= R.string.welcome_to_puracaspa),
-            modifier = Modifier.padding(horizontal = 38.dp, vertical = 8.dp),
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            fontSize = 22.sp
-        )
-
+fun TitleFrame(
+    title: String,
+    complement: String,
+    content: @Composable (PaddingValues) -> Unit
+) {
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = "$title $complement",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            )
+        }
+    ) { innerPadding ->
+        content(innerPadding)
     }
 }

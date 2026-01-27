@@ -24,9 +24,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.pura.caspa.R
-import com.pura.caspa.compose.BackgroundApp
+import com.pura.caspa.compose.PuraCaspaButton
 import com.pura.caspa.compose.TitleFrame
-import com.pura.caspa.compose.WoodButton
 import com.pura.caspa.presentation.viewmodel.UserNameViewModel
 
 @Composable
@@ -38,63 +37,68 @@ fun CreateOrJoinTable(
 ) {
     val nameState by viewModel.nameState.collectAsState()
 
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-    ) {
-        BackgroundApp()
-        Column(
-            modifier = Modifier
+    TitleFrame("Welcome to", "Pura Caspa"){paddongValues ->
+        Box(
+            modifier = modifier
                 .fillMaxSize()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .padding(paddongValues)
         ) {
-            TitleFrame()
-            Spacer(modifier = Modifier.height(40.dp))
-            Text(
-                text = stringResource(id = R.string.name_player),
-                color = Color.LightGray,
-                modifier = Modifier.align(Alignment.Start).padding(start = 8.dp)
-            )
-
-            TextField(
-                value = nameState,
-                onValueChange = { viewModel.onNameChange(it) },
-                placeholder = { Text(text = stringResource(id = R.string.name_suggestion), color = Color.Gray) },
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-                    .border(1.dp, colorResource(id = R.color.gold_border), RoundedCornerShape(12.dp)),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = colorResource(id = R.color.input_background),
-                    unfocusedContainerColor = colorResource(id = R.color.input_background),
-                    disabledContainerColor = colorResource(id = R.color.input_background),
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White
-                ),
-                shape = RoundedCornerShape(12.dp)
-            )
+                    .fillMaxSize()
+                    .padding(horizontal = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
+            ) {
+                Spacer(modifier = Modifier.height(60.dp))
+                Text(
+                    text = stringResource(id = R.string.name_player),
+                    color = Color.LightGray,
+                    modifier = Modifier.align(Alignment.Start).padding(start = 8.dp)
+                )
 
-            Spacer(modifier = Modifier.height(32.dp))
+                TextField(
+                    value = nameState,
+                    onValueChange = { viewModel.onNameChange(it) },
+                    placeholder = { Text(text = stringResource(id = R.string.name_suggestion), color = Color.Gray) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                        .border(1.dp, colorResource(id = R.color.gold_border), RoundedCornerShape(12.dp)),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = colorResource(id = R.color.input_background),
+                        unfocusedContainerColor = colorResource(id = R.color.input_background),
+                        disabledContainerColor = colorResource(id = R.color.input_background),
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                )
 
-            WoodButton(
-                text = stringResource(id = R.string.create_table),
-                onClick = {
-                    viewModel.saveName()
-                    onNavigateToConfirmTableCreation()
-                }
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            WoodButton(
-                text = stringResource(id = R.string.join_the_room),
-                onClick = {
-                    viewModel.saveName()
-                    onNavigatetoJoinTable()
-                }
-            )
+                Spacer(modifier = Modifier.height(32.dp))
+
+                PuraCaspaButton(
+                    text = stringResource(id = R.string.create_table),
+                    enabled = true,
+                    onClick = {
+                        viewModel.saveName()
+                        onNavigateToConfirmTableCreation()
+                    }
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                PuraCaspaButton(
+                    text = stringResource(id = R.string.join_the_room),
+                    enabled = true,
+                    onClick = {
+                        viewModel.saveName()
+                        onNavigatetoJoinTable()
+                    }
+                )
+                Spacer(modifier = Modifier.weight(1f))
+            }
         }
     }
+
 }

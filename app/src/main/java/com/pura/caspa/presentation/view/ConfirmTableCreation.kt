@@ -28,8 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.pura.caspa.R
-import com.pura.caspa.compose.BackgroundApp
-import com.pura.caspa.compose.WoodButton
+import com.pura.caspa.compose.PuraCaspaButton
 import com.pura.caspa.data.util.Resource
 import com.pura.caspa.presentation.viewmodel.ConfirmTableCreationViewModel
 
@@ -46,7 +45,6 @@ fun ConfirmTableCreation(
         modifier = modifier
             .fillMaxSize()
     ) {
-        BackgroundApp()
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -81,8 +79,9 @@ fun ConfirmTableCreation(
             Spacer(modifier = Modifier.height(32.dp))
 
             Spacer(modifier = Modifier.height(24.dp))
-            WoodButton(
+            PuraCaspaButton(
                 text = stringResource(id = R.string.confirm_table_creation),
+                enabled = true,
                 onClick = {
                     viewModel.createNewRoom(idTableCreation)
                 }
