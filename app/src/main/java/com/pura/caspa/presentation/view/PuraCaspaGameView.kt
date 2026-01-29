@@ -46,7 +46,7 @@ fun PuraCaspaGameView(
         viewModel.listenToRoom(nameTable)
     }
 
-    TitleFrame("Sala: ", nameTable){ paddingValues ->
+    TitleFrame("Sala:\n", nameTable){ paddingValues ->
         Column(
             modifier = modifier
                 .fillMaxSize()

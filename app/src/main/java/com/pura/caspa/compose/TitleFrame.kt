@@ -13,8 +13,8 @@ import androidx.compose.ui.text.font.FontWeight
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TitleFrame(
-    title: String,
-    complement: String,
+    title: String = "",
+    complement: String = "",
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
