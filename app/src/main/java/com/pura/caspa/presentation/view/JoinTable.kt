@@ -61,7 +61,10 @@ fun JoinTable(
 
                 TextField(
                     value = roomIdInput,
-                    onValueChange = { roomIdInput = it },
+                    onValueChange = {input->
+                        val cleanText = input.filter{!it.isWhitespace()}
+                        roomIdInput = cleanText
+                                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp)

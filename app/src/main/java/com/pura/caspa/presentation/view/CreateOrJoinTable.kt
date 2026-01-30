@@ -37,7 +37,7 @@ fun CreateOrJoinTable(
 ) {
     val nameState by viewModel.nameState.collectAsState()
 
-    TitleFrame("Welcome to", "Pura Caspa"){paddongValues ->
+    TitleFrame("Welcome to", "Pura Caspa") { paddongValues ->
         Box(
             modifier = modifier
                 .fillMaxSize()
@@ -54,17 +54,31 @@ fun CreateOrJoinTable(
                 Text(
                     text = stringResource(id = R.string.name_player),
                     color = Color.LightGray,
-                    modifier = Modifier.align(Alignment.Start).padding(start = 8.dp)
+                    modifier = Modifier
+                        .align(Alignment.Start)
+                        .padding(start = 8.dp)
                 )
 
                 TextField(
                     value = nameState,
-                    onValueChange = { viewModel.onNameChange(it) },
-                    placeholder = { Text(text = stringResource(id = R.string.name_suggestion), color = Color.Gray) },
+                    onValueChange = { input ->
+                        val cleanText = input.filter { !it.isWhitespace() }
+                        viewModel.onNameChange(cleanText)
+                    },
+                    placeholder = {
+                        Text(
+                            text = stringResource(id = R.string.name_suggestion),
+                            color = Color.Gray
+                        )
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp)
-                        .border(1.dp, colorResource(id = R.color.gold_border), RoundedCornerShape(12.dp)),
+                        .border(
+                            1.dp,
+                            colorResource(id = R.color.gold_border),
+                            RoundedCornerShape(12.dp)
+                        ),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = colorResource(id = R.color.input_background),
                         unfocusedContainerColor = colorResource(id = R.color.input_background),

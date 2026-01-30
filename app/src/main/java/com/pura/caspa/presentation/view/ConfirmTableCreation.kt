@@ -61,7 +61,10 @@ fun ConfirmTableCreation(
 
                 TextField(
                     value = idTableCreation,
-                    onValueChange = { idTableCreation = it },
+                    onValueChange = {input->
+                        val cleanText = input.filter{!it.isWhitespace()}
+                        idTableCreation = cleanText
+                                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp)
