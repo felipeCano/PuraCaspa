@@ -50,7 +50,7 @@ fun CreateOrJoinTable(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
-                Spacer(modifier = Modifier.height(60.dp))
+                Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = stringResource(id = R.string.name_player),
                     color = Color.LightGray,
@@ -62,8 +62,7 @@ fun CreateOrJoinTable(
                 TextField(
                     value = nameState,
                     onValueChange = { input ->
-                        val cleanText = input.filter { !it.isWhitespace() }
-                        viewModel.onNameChange(cleanText)
+                        viewModel.onNameChange(input)
                     },
                     placeholder = {
                         Text(
@@ -90,9 +89,16 @@ fun CreateOrJoinTable(
                     ),
                     shape = RoundedCornerShape(12.dp)
                 )
-
-                Spacer(modifier = Modifier.height(32.dp))
-
+                Spacer(modifier = Modifier.weight(3f))
+            }
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    //.fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 PuraCaspaButton(
                     text = stringResource(id = R.string.create_table),
                     enabled = true,
@@ -110,7 +116,6 @@ fun CreateOrJoinTable(
                         onNavigatetoJoinTable()
                     }
                 )
-                Spacer(modifier = Modifier.weight(1f))
             }
         }
     }
