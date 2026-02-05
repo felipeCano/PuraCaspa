@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -31,6 +32,7 @@ import com.pura.caspa.compose.PuraCaspaButton
 import com.pura.caspa.compose.TitleFrame
 import com.pura.caspa.data.util.Resource
 import com.pura.caspa.presentation.viewmodel.PuraCaspaGameViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,7 +48,7 @@ fun PuraCaspaGameView(
         viewModel.listenToRoom(nameTable)
     }
 
-    TitleFrame("Sala:\n", nameTable){ paddingValues ->
+    TitleFrame("Sala:\n", nameTable) { paddingValues ->
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -135,9 +137,17 @@ fun PuraCaspaGameView(
                                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                                 ) {
                                     Column(modifier = Modifier.padding(24.dp)) {
-                                        Text("Jugadores (${integrantes.size}):", fontWeight = FontWeight.Bold)
+                                        Text(
+                                            "Jugadores (${integrantes.size}):",
+                                            fontWeight = FontWeight.Bold
+                                        )
                                         Spacer(modifier = Modifier.height(8.dp))
-                                        integrantes.forEach { Text("• $it", style = MaterialTheme.typography.bodyLarge) }
+                                        integrantes.forEach {
+                                            Text(
+                                                "• $it",
+                                                style = MaterialTheme.typography.bodyLarge
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -155,7 +165,38 @@ fun PuraCaspaGameView(
                     }
                 }
                 is Resource.Loading -> CircularProgressIndicator()
-                is Resource.Error -> Text("Error al cargar datos")
+                is Resource.Error -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(2f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(32.dp),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color.White)
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .padding(vertical = 48.dp, horizontal = 16.dp)
+                                    .fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = state.message ?: "Error",
+                                    color = Color.Red,
+                                    fontSize = 28.sp,
+                                    lineHeight = 34.sp,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }

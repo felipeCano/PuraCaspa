@@ -54,11 +54,20 @@ class PuraCaspaGameViewModel @Inject constructor(
 
             viewModelScope.launch {
                 //3. We call the UseCase passing the required parameters
-                startGameUseCase(
+                val result = startGameUseCase(
                     roomId = roomId,
                     integrantes = roomData!!.integrantes,
                     usedWords = roomData.usedWords
                 )
+
+                when (result) {
+                    is Resource.Error -> {
+                        _partyData.value = Resource.Error(result.message ?: "Error desconocido")
+                    }
+                    is Resource.Success -> {
+                    }
+                    is Resource.Loading -> {}
+                }
             }
         }
     }
