@@ -28,4 +28,6 @@ interface PuraCaspaRepository {
         roomId: String, word: String, impostor: String, status: String,
         newUsedWordsList: List<String>
     ): Resource<Unit>
+
+    suspend fun getInstallationId(): String
 }

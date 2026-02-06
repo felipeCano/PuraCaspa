@@ -19,6 +19,7 @@ lifecycleViewmodelKtx = "2.10.0"
 hilt = "2.51.1"
 googleServices = "4.4.2"
 navigationCompose = "2.9.6"
+firebaseInstallations = "17.2.0"
 
 
 [libraries]
@@ -31,6 +32,7 @@ androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-view
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
+firebase-installations-ktx = { module = "com.google.firebase:firebase-installations-ktx", version.ref = "firebaseInstallations" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

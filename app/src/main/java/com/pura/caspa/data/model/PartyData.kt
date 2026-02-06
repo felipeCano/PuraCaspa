@@ -4,7 +4,7 @@ data class PartyData(
     val id: String = "",
     val host_id: String = "",
     val stateParty: String = "",
-    val integrantes: List<String> = emptyList(),
+    val integrantes: List<Player> = emptyList(),
     val palabra_actual: String = "",
     val amoung_us : String = "",
     val usedWords: List<String> = emptyList()

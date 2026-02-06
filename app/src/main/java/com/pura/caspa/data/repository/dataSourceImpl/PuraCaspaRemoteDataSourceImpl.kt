@@ -2,7 +2,9 @@ package com.pura.caspa.data.repository.dataSourceImpl
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.pura.caspa.data.model.PartyData
+import com.pura.caspa.data.model.Player
 import com.pura.caspa.data.model.Words
+import com.pura.caspa.data.remote.dataSource.InstallationIdProvider
 import com.pura.caspa.data.repository.dataSource.PuraCaspaRemoteDataSource
 import com.pura.caspa.data.util.Resource
 import kotlinx.coroutines.channels.awaitClose
@@ -10,7 +12,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
-class PuraCaspaRemoteDataSourceImpl(private val db: FirebaseFirestore) : PuraCaspaRemoteDataSource {
+class PuraCaspaRemoteDataSourceImpl(
+    private val db: FirebaseFirestore,
+    private val installationIdProvider: InstallationIdProvider
+    ) : PuraCaspaRemoteDataSource {
 
     override suspend fun fetchWords(): Words {
         return try {
@@ -53,6 +58,7 @@ class PuraCaspaRemoteDataSourceImpl(private val db: FirebaseFirestore) : PuraCas
         return try {
             val db = FirebaseFirestore.getInstance()
             val roomRef = db.collection("salas").document(roomId)
+            val installationId = installationIdProvider.getInstallationId()
 
             db.runTransaction { transaction ->
                 val snapshot = transaction.get(roomRef)
@@ -61,15 +67,24 @@ class PuraCaspaRemoteDataSourceImpl(private val db: FirebaseFirestore) : PuraCas
                     throw Exception("La sala no existe")
                 }
 
-                val integrantes = snapshot.get("integrantes") as? MutableList<String> ?: mutableListOf()
+                val partyData = snapshot.toObject(PartyData::class.java)
+                val integrantes = partyData?.integrantes?.toMutableList() ?: mutableListOf()
 
-                // Verificamos si ya está en la sala para no duplicarlo
-                if (!integrantes.contains(userName)) {
-                    integrantes.add(userName)
+                val existingPlayer = integrantes.find { it.id == installationId }
+                if (existingPlayer == null) {
+                    // Si el dispositivo NO está en la lista, lo agregamos
+                    val newPlayer = Player(id = installationId, name = userName)
+                    integrantes.add(newPlayer)
                     transaction.update(roomRef, "integrantes", integrantes)
+                } else {
+                    // Si el dispositivo YA ESTÁ, pero cambió su nombre, lo actualizamos (opcional)
+                    if (existingPlayer.name != userName) {
+                        val index = integrantes.indexOf(existingPlayer)
+                        integrantes[index] = existingPlayer.copy(name = userName)
+                        transaction.update(roomRef, "integrantes", integrantes)
+                    }
                 }
             }.await()
-
             Resource.Success(Unit)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "Error al unirse a la sala")

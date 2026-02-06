@@ -85,6 +85,8 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     //Navigation Compose
     implementation(libs.androidx.navigation.compose)
+    //FirebaseInstallation
+    implementation(libs.firebase.installations.ktx)
 }
 
 kapt {

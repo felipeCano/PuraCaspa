@@ -1,6 +1,7 @@
 package com.pura.caspa.presentation.di
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.pura.caspa.data.remote.dataSource.InstallationIdProvider
 import com.pura.caspa.data.repository.dataSource.PuraCaspaRemoteDataSource
 import com.pura.caspa.data.repository.dataSourceImpl.PuraCaspaRemoteDataSourceImpl
 import dagger.Module
@@ -15,8 +16,10 @@ class RemoteDataModule {
 
     @Singleton
     @Provides
-    fun providePuraCaspaRemoteDataSource(firebaseFirestore: FirebaseFirestore
+    fun providePuraCaspaRemoteDataSource(
+        firebaseFirestore: FirebaseFirestore,
+        installationIdProvider: InstallationIdProvider
     ): PuraCaspaRemoteDataSource {
-        return PuraCaspaRemoteDataSourceImpl(firebaseFirestore)
+        return PuraCaspaRemoteDataSourceImpl(firebaseFirestore, installationIdProvider)
     }
 }

@@ -4,11 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pura.caspa.data.model.PartyData
 import com.pura.caspa.data.util.Resource
+import com.pura.caspa.domain.usecase.GetInstallationIdUseCase
 import com.pura.caspa.domain.usecase.GetPartyDataUseCase
 import com.pura.caspa.domain.usecase.GetUserNameUseCase
 import com.pura.caspa.domain.usecase.StartGameUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -17,6 +19,7 @@ import javax.inject.Inject
 class PuraCaspaGameViewModel @Inject constructor(
     private val getUserNameUseCase: GetUserNameUseCase,
     private val getPartyDataUseCase: GetPartyDataUseCase,
+    private val getInstallationIdUseCase: GetInstallationIdUseCase,
     private val startGameUseCase: StartGameUseCase
 ) : ViewModel() {
 
@@ -24,10 +27,20 @@ class PuraCaspaGameViewModel @Inject constructor(
     val partyData = _partyData.asStateFlow()
 
     private val _currentUserName = MutableStateFlow("")
-    val currentUserName = _currentUserName.asStateFlow()
+    //val currentUserName = _currentUserName.asStateFlow()
+
+    private val _myId = MutableStateFlow<String>("")
+    val myId: StateFlow<String> = _myId.asStateFlow()
 
     init {
+        loadMyInstallationId()
         loadUserName()
+    }
+
+    private fun loadMyInstallationId() {
+        viewModelScope.launch {
+            _myId.value = getInstallationIdUseCase()
+        }
     }
 
     private fun loadUserName() {

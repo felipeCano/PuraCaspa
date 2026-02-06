@@ -2,6 +2,7 @@ package com.pura.caspa.presentation.di
 
 import com.pura.caspa.domain.repository.PuraCaspaRepository
 import com.pura.caspa.domain.usecase.CreatePartyUseCase
+import com.pura.caspa.domain.usecase.GetInstallationIdUseCase
 import com.pura.caspa.domain.usecase.GetPartyDataUseCase
 import com.pura.caspa.domain.usecase.GetUserNameUseCase
 import com.pura.caspa.domain.usecase.GetWordsToPlayUseCase
@@ -72,5 +73,13 @@ class UseCaseModule {
         puraCaspaRepository: PuraCaspaRepository
     ): StartGameUseCase {
         return StartGameUseCase(puraCaspaRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideGetInstallationIdUseCase(
+        puraCaspaRepository: PuraCaspaRepository
+    ): GetInstallationIdUseCase {
+        return GetInstallationIdUseCase(puraCaspaRepository)
     }
 }

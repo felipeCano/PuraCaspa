@@ -2,7 +2,9 @@ package com.pura.caspa.data.repository
 
 import com.pura.caspa.data.local.dataSource.UserPreferencesManager
 import com.pura.caspa.data.model.PartyData
+import com.pura.caspa.data.model.Player
 import com.pura.caspa.data.model.Words
+import com.pura.caspa.data.remote.dataSource.InstallationIdProvider
 import com.pura.caspa.data.repository.dataSource.PuraCaspaRemoteDataSource
 import com.pura.caspa.data.util.Resource
 import com.pura.caspa.domain.repository.PuraCaspaRepository
@@ -10,7 +12,8 @@ import kotlinx.coroutines.flow.Flow
 
 class PuraCaspaRepositoryImpl(
     private val puraCaspaRemoteDataSource: PuraCaspaRemoteDataSource,
-    private val userPreferencesManager: UserPreferencesManager
+    private val userPreferencesManager: UserPreferencesManager,
+    private val installationIdProvider: InstallationIdProvider
 ) : PuraCaspaRepository {
 
     override suspend fun getWordstoPlay(): Resource<Words> {
@@ -29,9 +32,10 @@ class PuraCaspaRepositoryImpl(
     //CreatePartyUsesCases
     override suspend fun createParty(customId: String): Resource<String> {
         val userName = userPreferencesManager.getName() // El host es el usuario actual
+        val installationId = getInstallationId()
         val newRoom = PartyData(
-            host_id = userName,
-            integrantes = listOf(userName),
+            host_id = installationId,
+            integrantes = listOf(Player(id = installationId, name = userName)),
             stateParty = "waiting"
         )
         return puraCaspaRemoteDataSource.createParty(customId, newRoom)
@@ -64,5 +68,9 @@ class PuraCaspaRepositoryImpl(
             status,
             newUsedWordsList
         )
+    }
+
+    override suspend fun getInstallationId(): String {
+        return installationIdProvider.getInstallationId()
     }
 }

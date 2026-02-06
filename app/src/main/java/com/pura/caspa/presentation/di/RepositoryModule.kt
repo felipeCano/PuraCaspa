@@ -1,6 +1,7 @@
 package com.pura.caspa.presentation.di
 
 import com.pura.caspa.data.local.dataSource.UserPreferencesManager
+import com.pura.caspa.data.remote.dataSource.InstallationIdProvider
 import com.pura.caspa.data.repository.PuraCaspaRepositoryImpl
 import com.pura.caspa.data.repository.dataSource.PuraCaspaRemoteDataSource
 import com.pura.caspa.domain.repository.PuraCaspaRepository
@@ -18,8 +19,9 @@ class RepositoryModule {
     @Provides
     fun providePuraCaspaRepository(
         puraCaspaRemoteDataSource: PuraCaspaRemoteDataSource,
-        userPreferencesManager: UserPreferencesManager
+        userPreferencesManager: UserPreferencesManager,
+        installationIdProvider: InstallationIdProvider
     ): PuraCaspaRepository {
-        return PuraCaspaRepositoryImpl(puraCaspaRemoteDataSource, userPreferencesManager)
+        return PuraCaspaRepositoryImpl(puraCaspaRemoteDataSource, userPreferencesManager, installationIdProvider)
     }
 }

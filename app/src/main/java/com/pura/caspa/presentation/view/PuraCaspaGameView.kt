@@ -42,7 +42,7 @@ fun PuraCaspaGameView(
     viewModel: PuraCaspaGameViewModel = hiltViewModel()
 ) {
     val roomState by viewModel.partyData.collectAsState()
-    val myName by viewModel.currentUserName.collectAsState()
+    val myId by viewModel.myId.collectAsState()
 
     LaunchedEffect(key1 = nameTable) {
         viewModel.listenToRoom(nameTable)
@@ -60,7 +60,7 @@ fun PuraCaspaGameView(
                 is Resource.Success -> {
                     val partyData = state.data
                     val integrantes = partyData?.integrantes ?: emptyList()
-                    val isHost = partyData?.host_id == myName
+                    val isHost = partyData?.host_id == myId
 
                     Box(
                         modifier = Modifier
@@ -69,7 +69,7 @@ fun PuraCaspaGameView(
                         contentAlignment = Alignment.Center
                     ) {
                         if (partyData?.stateParty == "jugando") {
-                            val isImpostor = partyData.amoung_us == myName
+                            val isImpostor = partyData.amoung_us == myId
 
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
@@ -144,7 +144,7 @@ fun PuraCaspaGameView(
                                         Spacer(modifier = Modifier.height(8.dp))
                                         integrantes.forEach {
                                             Text(
-                                                "• $it",
+                                                "• ${it.name}",
                                                 style = MaterialTheme.typography.bodyLarge
                                             )
                                         }

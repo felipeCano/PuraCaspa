@@ -1,12 +1,13 @@
 package com.pura.caspa.domain.usecase
 
+import com.pura.caspa.data.model.Player
 import com.pura.caspa.data.util.Resource
 import com.pura.caspa.domain.repository.PuraCaspaRepository
 
 class StartGameUseCase(private val puraCaspaRepository: PuraCaspaRepository) {
     suspend operator fun invoke(
         roomId: String,
-        integrantes: List<String>,
+        integrantes: List<Player>,
         usedWords: List<String>
     ): Resource<Unit> {
         //1. We get the words from the repository
@@ -33,7 +34,7 @@ class StartGameUseCase(private val puraCaspaRepository: PuraCaspaRepository) {
         return puraCaspaRepository.updatePartyStart(
             roomId = roomId,
             word = selectedWord,
-            impostor = luckyImpostor,
+            impostor = luckyImpostor.id,
             status = "jugando",
             newUsedWordsList = usedWords + selectedWord //We concatenate the new
         )
