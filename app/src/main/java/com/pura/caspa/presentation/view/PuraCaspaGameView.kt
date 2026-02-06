@@ -153,6 +153,7 @@ fun PuraCaspaGameView(
                             }
                         }
                     }
+                    Spacer(modifier = Modifier.weight(0.2f))
                     if (isHost) {
                         PuraCaspaButton(
                             text = if (partyData.stateParty == "waiting") "INICIAR JUEGO" else "SIGUIENTE PALABRA",
@@ -164,12 +165,13 @@ fun PuraCaspaGameView(
                         )
                     }
                 }
+
                 is Resource.Loading -> CircularProgressIndicator()
                 is Resource.Error -> {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(2f),
+                            .weight(1f),
                         contentAlignment = Alignment.Center
                     ) {
                         Card(
@@ -191,11 +193,12 @@ fun PuraCaspaGameView(
                                     fontSize = 28.sp,
                                     lineHeight = 34.sp,
                                     textAlign = TextAlign.Center,
-                                    modifier = Modifier.padding(16.dp)
+                                    fontWeight = FontWeight.Black
                                 )
                             }
                         }
                     }
+                    Spacer(modifier = Modifier.weight(0.2f))
                 }
             }
         }

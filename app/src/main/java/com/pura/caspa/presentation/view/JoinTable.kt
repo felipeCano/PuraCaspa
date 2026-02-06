@@ -85,17 +85,6 @@ fun JoinTable(
                     shape = RoundedCornerShape(12.dp)
                 )
 
-                Spacer(modifier = Modifier.height(32.dp))
-
-                Spacer(modifier = Modifier.height(24.dp))
-                PuraCaspaButton(
-                    text = stringResource(id = R.string.join_table),
-                    enabled = true,
-                    onClick = {
-                        viewModel.joinToRoom(roomIdInput)
-                    }
-                )
-
                 if (state.message != null || state.data != null) {
                     //Handle state
                     when (state) {
@@ -112,6 +101,22 @@ fun JoinTable(
                         else -> {}
                     }
                 }
+            }
+            Column(
+                modifier = modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                PuraCaspaButton(
+                    text = stringResource(id = R.string.join_table),
+                    enabled = true,
+                    onClick = {
+                        viewModel.joinToRoom(roomIdInput)
+                    }
+                )
             }
         }
     }
