@@ -37,9 +37,10 @@ import com.pura.caspa.presentation.viewmodel.JoinTableViewModel
 fun JoinTable(
     onNavigateJoinToPuraCaspaGameView: (String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: JoinTableViewModel = hiltViewModel()
+    viewModel: JoinTableViewModel = hiltViewModel(),
+    initialTableId: String? = null
 ) {
-    var roomIdInput by remember { mutableStateOf("") }
+    var roomIdInput by remember { mutableStateOf(initialTableId ?: "") }
     val state by viewModel.joinState.collectAsState()
     TitleFrame("Party Name To Join") {
         Box(
