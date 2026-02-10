@@ -1,5 +1,6 @@
 package com.pura.caspa.presentation.view
 
+import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -26,6 +28,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.pura.caspa.R
 import com.pura.caspa.compose.PuraCaspaButton
 import com.pura.caspa.compose.TitleFrame
+import com.pura.caspa.compose.textFieldColors
 import com.pura.caspa.presentation.viewmodel.UserNameViewModel
 
 @Composable
@@ -36,6 +39,7 @@ fun CreateOrJoinTable(
     viewModel: UserNameViewModel = hiltViewModel()
 ) {
     val nameState by viewModel.nameState.collectAsState()
+    val context = LocalContext.current
 
     TitleFrame("Welcome to", "Pura Caspa") { paddongValues ->
         Box(
@@ -78,15 +82,7 @@ fun CreateOrJoinTable(
                             colorResource(id = R.color.gold_border),
                             RoundedCornerShape(12.dp)
                         ),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = colorResource(id = R.color.input_background),
-                        unfocusedContainerColor = colorResource(id = R.color.input_background),
-                        disabledContainerColor = colorResource(id = R.color.input_background),
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White
-                    ),
+                    colors = textFieldColors(),
                     shape = RoundedCornerShape(12.dp)
                 )
                 Spacer(modifier = Modifier.weight(3f))
@@ -94,7 +90,6 @@ fun CreateOrJoinTable(
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    //.fillMaxWidth()
                     .padding(horizontal = 24.dp)
                     .padding(bottom = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -103,8 +98,17 @@ fun CreateOrJoinTable(
                     text = stringResource(id = R.string.create_table),
                     enabled = true,
                     onClick = {
-                        viewModel.saveName()
-                        onNavigateToConfirmTableCreation()
+                        if (nameState.isBlank()){
+                            Toast.makeText(
+                                context,
+                                "Debes ingresar un nombre",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }else{
+                            viewModel.saveName()
+                            onNavigateToConfirmTableCreation()
+                        }
+
                     }
                 )
                 Spacer(modifier = Modifier.height(24.dp))
@@ -112,8 +116,16 @@ fun CreateOrJoinTable(
                     text = stringResource(id = R.string.join_the_room),
                     enabled = true,
                     onClick = {
+                        if (nameState.isBlank()){
+                            Toast.makeText(
+                                context,
+                                "Debes ingresar un nombre",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }else{
                         viewModel.saveName()
                         onNavigatetoJoinTable()
+                            }
                     }
                 )
             }

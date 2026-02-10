@@ -1,5 +1,6 @@
 package com.pura.caspa.presentation.view
 
+import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -30,6 +33,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.pura.caspa.R
 import com.pura.caspa.compose.PuraCaspaButton
 import com.pura.caspa.compose.TitleFrame
+import com.pura.caspa.compose.textFieldColors
 import com.pura.caspa.data.util.Resource
 import com.pura.caspa.presentation.viewmodel.JoinTableViewModel
 
@@ -42,6 +46,19 @@ fun JoinTable(
 ) {
     var roomIdInput by remember { mutableStateOf(initialTableId ?: "") }
     val state by viewModel.joinState.collectAsState()
+    val userName by viewModel.getName.collectAsState()
+    val nameState by viewModel.nameState.collectAsState()
+    val context = LocalContext.current
+
+    LaunchedEffect(state) {
+        if (state is Resource.Success) {
+            onNavigateJoinToPuraCaspaGameView(roomIdInput)
+        }
+    }
+    LaunchedEffect(Unit) {
+        viewModel.getName()
+    }
+
     TitleFrame("Party Name To Join") {
         Box(
             modifier = modifier
@@ -54,18 +71,52 @@ fun JoinTable(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+                if (userName.isEmpty()) {
+                    Text(
+                        text = stringResource(id = R.string.name_player),
+                        color = Color.LightGray,
+                        modifier = Modifier
+                            .align(Alignment.Start)
+                            .padding(start = 8.dp)
+                    )
+                    TextField(
+                        value = nameState,
+                        onValueChange = { input ->
+                            viewModel.onNameChange(input)
+                        },
+                        placeholder = {
+                            Text(
+                                text = stringResource(id = R.string.name_suggestion),
+                                color = Color.Gray
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .border(
+                                1.dp,
+                                colorResource(id = R.color.gold_border),
+                                RoundedCornerShape(12.dp)
+                            ),
+                        colors = textFieldColors(),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
                 Text(
                     text = "Ingresa el nombre de la sala",
                     color = Color.LightGray,
-                    modifier = Modifier.align(Alignment.Start).padding(start = 8.dp)
+                    modifier = Modifier
+                        .align(Alignment.Start)
+                        .padding(start = 8.dp)
                 )
 
                 TextField(
                     value = roomIdInput,
-                    onValueChange = {input->
-                        val cleanText = input.filter{!it.isWhitespace()}
+                    onValueChange = { input ->
+                        val cleanText = input.filter { !it.isWhitespace() }
                         roomIdInput = cleanText
-                                    },
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp)
@@ -74,32 +125,22 @@ fun JoinTable(
                             colorResource(id = R.color.gold_border),
                             RoundedCornerShape(12.dp)
                         ),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = colorResource(id = R.color.input_background),
-                        unfocusedContainerColor = colorResource(id = R.color.input_background),
-                        disabledContainerColor = colorResource(id = R.color.input_background),
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White
-                    ),
+                    colors = textFieldColors(),
                     shape = RoundedCornerShape(12.dp)
                 )
-
-                if (state.message != null || state.data != null) {
-                    //Handle state
-                    when (state) {
+                state?.let { currentState ->
+                    when (currentState) {
                         is Resource.Loading -> {
-                            CircularProgressIndicator()
+                            CircularProgressIndicator(color = colorResource(R.color.gold_border))
                         }
 
-                        is Resource.Error -> Text(state.message ?: "Error", color = Color.Red)
+                        is Resource.Error -> {
+                            Text(currentState.message ?: "Error", color = Color.Red)
+                        }
+
                         is Resource.Success -> {
-                            Text("Sala '${state.data}' creada con éxito", color = Color.Green)
-                            onNavigateJoinToPuraCaspaGameView(roomIdInput)
+                            Text("¡Sala encontrada! Entrando...", color = Color.Green)
                         }
-
-                        else -> {}
                     }
                 }
             }
@@ -115,7 +156,19 @@ fun JoinTable(
                     text = stringResource(id = R.string.join_table),
                     enabled = true,
                     onClick = {
-                        viewModel.joinToRoom(roomIdInput)
+                        val finalName = if (userName.isEmpty()) nameState else userName
+                        if (finalName.isBlank() || roomIdInput.isBlank()) {
+                            Toast.makeText(
+                                context,
+                                "Debes ingresar un nombre y un código de sala",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            if (userName.isEmpty()) {
+                                viewModel.saveName()
+                            }
+                            viewModel.joinToRoom(roomIdInput)
+                        }
                     }
                 )
             }

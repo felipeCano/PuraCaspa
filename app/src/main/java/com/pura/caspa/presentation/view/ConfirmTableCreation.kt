@@ -30,6 +30,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.pura.caspa.R
 import com.pura.caspa.compose.PuraCaspaButton
 import com.pura.caspa.compose.TitleFrame
+import com.pura.caspa.compose.textFieldColors
 import com.pura.caspa.data.util.Resource
 import com.pura.caspa.presentation.viewmodel.ConfirmTableCreationViewModel
 
@@ -73,15 +74,7 @@ fun ConfirmTableCreation(
                             colorResource(id = R.color.gold_border),
                             RoundedCornerShape(12.dp)
                         ),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = colorResource(id = R.color.input_background),
-                        unfocusedContainerColor = colorResource(id = R.color.input_background),
-                        disabledContainerColor = colorResource(id = R.color.input_background),
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White
-                    ),
+                    colors = textFieldColors(),
                     shape = RoundedCornerShape(12.dp)
                 )
                 if (state.message != null || state.data != null) {
