@@ -8,6 +8,7 @@ import com.pura.caspa.domain.usecase.GetUserNameUseCase
 import com.pura.caspa.domain.usecase.GetWordsToPlayUseCase
 import com.pura.caspa.domain.usecase.JoinPartyUseCase
 import com.pura.caspa.domain.usecase.SaveUserNameUseCase
+import com.pura.caspa.domain.usecase.SharePartyIDUseCase
 import com.pura.caspa.domain.usecase.StartGameUseCase
 import dagger.Module
 import dagger.Provides
@@ -81,5 +82,13 @@ class UseCaseModule {
         puraCaspaRepository: PuraCaspaRepository
     ): GetInstallationIdUseCase {
         return GetInstallationIdUseCase(puraCaspaRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideSharePartyIDUseCase(
+        puraCaspaRepository: PuraCaspaRepository
+    ): SharePartyIDUseCase {
+        return SharePartyIDUseCase(puraCaspaRepository)
     }
 }

@@ -7,6 +7,7 @@ import com.pura.caspa.data.util.Resource
 import com.pura.caspa.domain.usecase.GetInstallationIdUseCase
 import com.pura.caspa.domain.usecase.GetPartyDataUseCase
 import com.pura.caspa.domain.usecase.GetUserNameUseCase
+import com.pura.caspa.domain.usecase.SharePartyIDUseCase
 import com.pura.caspa.domain.usecase.StartGameUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,17 +21,20 @@ class PuraCaspaGameViewModel @Inject constructor(
     private val getUserNameUseCase: GetUserNameUseCase,
     private val getPartyDataUseCase: GetPartyDataUseCase,
     private val getInstallationIdUseCase: GetInstallationIdUseCase,
-    private val startGameUseCase: StartGameUseCase
+    private val startGameUseCase: StartGameUseCase,
+    private val sharePartyIDUseCase: SharePartyIDUseCase
 ) : ViewModel() {
 
     private val _partyData = MutableStateFlow<Resource<PartyData>>(Resource.Loading())
     val partyData = _partyData.asStateFlow()
 
     private val _currentUserName = MutableStateFlow("")
-    //val currentUserName = _currentUserName.asStateFlow()
 
     private val _myId = MutableStateFlow<String>("")
     val myId: StateFlow<String> = _myId.asStateFlow()
+
+    private val _shareMessage = MutableStateFlow("")
+    val shareMessage = _shareMessage.asStateFlow()
 
     init {
         loadMyInstallationId()
@@ -83,5 +87,14 @@ class PuraCaspaGameViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun onShareClicked(roomId: String) {
+        val message = sharePartyIDUseCase(partyId = roomId)
+        _shareMessage.value = message
+    }
+
+    fun onShareDone() {
+        _shareMessage.value = ""
     }
 }

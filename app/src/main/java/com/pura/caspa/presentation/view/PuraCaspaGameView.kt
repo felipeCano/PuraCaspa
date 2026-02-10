@@ -1,5 +1,7 @@
 package com.pura.caspa.presentation.view
 
+import android.content.Intent
+import android.opengl.Visibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,9 +21,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,9 +50,25 @@ fun PuraCaspaGameView(
 ) {
     val roomState by viewModel.partyData.collectAsState()
     val myId by viewModel.myId.collectAsState()
+    var isVisible by remember { mutableStateOf(true) }
+    val context = LocalContext.current
+    val messageToShare by viewModel.shareMessage.collectAsState()
 
     LaunchedEffect(key1 = nameTable) {
         viewModel.listenToRoom(nameTable)
+    }
+
+    LaunchedEffect(messageToShare) {
+        if (messageToShare.isNotEmpty()) {
+            val sendIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, messageToShare)
+                type = "text/plain"
+            }
+            val shareIntent = Intent.createChooser(sendIntent, null)
+            context.startActivity(shareIntent)
+            viewModel.onShareDone()
+        }
     }
 
     TitleFrame("Sala:\n", nameTable) { paddingValues ->
@@ -156,8 +179,28 @@ fun PuraCaspaGameView(
                     Spacer(modifier = Modifier.weight(0.2f))
                     if (isHost) {
                         PuraCaspaButton(
+                            text = "COMPARTIR SALA",
+                            onClick = {
+                                viewModel.onShareClicked(nameTable)
+                            },
+                            enabled = isVisible,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(64.dp)
+                                .graphicsLayer {
+                                    alpha = if (isVisible) 1f else 0f
+                                },
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+
+                        PuraCaspaButton(
                             text = if (partyData.stateParty == "waiting") "INICIAR JUEGO" else "SIGUIENTE PALABRA",
-                            onClick = { viewModel.onStartGameClicked(nameTable) },
+                            onClick = {
+                                viewModel.onStartGameClicked(nameTable)
+                                isVisible = false
+                            },
                             enabled = integrantes.size >= 2,
                             modifier = Modifier
                                 .fillMaxWidth()
