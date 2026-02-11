@@ -4,7 +4,7 @@ import com.pura.caspa.domain.repository.PuraCaspaRepository
 
 class SharePartyIDUseCase(val puraCaspaRepository: PuraCaspaRepository) {
     operator fun invoke(partyId: String): String {
-        val deepLink = "https://puracaspa.com/join/$partyId"
+        val deepLink = "https://puracaspa-f66ed.web.app/join/$partyId"
         return "¡Únete a mi partida de Pura Caspa! Toca aquí: $deepLink"
     }
 }

@@ -34,7 +34,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="puracaspa.com"
+                    android:host="puracaspa-f66ed.web.app"
                     android:pathPrefix="/join/"
                     android:scheme="https" />
             </intent-filter>

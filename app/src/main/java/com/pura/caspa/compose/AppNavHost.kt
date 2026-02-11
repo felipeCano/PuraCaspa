@@ -70,7 +70,7 @@ fun AppNavHost(
                 }
             ),
             deepLinks = listOf(
-                navDeepLink { uriPattern = "https://puracaspa.com/join/{table_id}" }
+                navDeepLink { uriPattern = "https://puracaspa-f66ed.web.app/join/{table_id}" }
             )
         ){ backStackEntry ->
             val idComingDeepLink = backStackEntry.arguments?.getString("table_id")
