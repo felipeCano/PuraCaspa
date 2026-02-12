@@ -84,6 +84,7 @@ class PuraCaspaGameViewModel @Inject constructor(
                     is Resource.Success -> {
                     }
                     is Resource.Loading -> {}
+                    is Resource.Idle -> {}
                 }
             }
         }

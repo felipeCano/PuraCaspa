@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 class ConfirmTableCreationViewModel @Inject constructor(
     private val createPartyUseCase: CreatePartyUseCase
 ) : ViewModel() {
-    private val _createPartyState = MutableStateFlow<Resource<String>>(Resource.Loading())
+    private val _createPartyState = MutableStateFlow<Resource<Unit>?>(null)
     val createPartyState = _createPartyState.asStateFlow()
 
     fun createNewRoom(roomName: String) {
@@ -28,5 +28,9 @@ class ConfirmTableCreationViewModel @Inject constructor(
             _createPartyState.value = Resource.Loading()
             _createPartyState.value = createPartyUseCase(roomName)
         }
+    }
+
+    fun resetState() {
+        _createPartyState.value = Resource.Idle()
     }
 }

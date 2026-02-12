@@ -243,6 +243,7 @@ fun PuraCaspaGameView(
                     }
                     Spacer(modifier = Modifier.weight(0.2f))
                 }
+                is Resource.Idle ->{}
             }
         }
     }

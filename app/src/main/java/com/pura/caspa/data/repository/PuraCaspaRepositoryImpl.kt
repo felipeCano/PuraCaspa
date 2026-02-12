@@ -30,7 +30,7 @@ class PuraCaspaRepositoryImpl(
     override fun getUserName(): String = userPreferencesManager.getName()
 
     //CreatePartyUsesCases
-    override suspend fun createParty(customId: String): Resource<String> {
+    override suspend fun createParty(customId: String): Resource<Unit> {
         val userName = userPreferencesManager.getName() // El host es el usuario actual
         val installationId = getInstallationId()
         val newRoom = PartyData(

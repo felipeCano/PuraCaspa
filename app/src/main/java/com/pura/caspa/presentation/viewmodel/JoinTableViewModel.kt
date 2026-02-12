@@ -47,6 +47,10 @@ class JoinTableViewModel @Inject constructor(
         }
     }
 
+    fun resetState() {
+        _joinState.value = Resource.Idle()
+    }
+
     fun getName(){
         viewModelScope.launch {
             _getName.value = getUserNameUseCase()

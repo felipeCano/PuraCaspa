@@ -53,6 +53,7 @@ fun JoinTable(
     LaunchedEffect(state) {
         if (state is Resource.Success) {
             onNavigateJoinToPuraCaspaGameView(roomIdInput)
+            viewModel.resetState()
         }
     }
     LaunchedEffect(Unit) {
@@ -141,6 +142,7 @@ fun JoinTable(
                         is Resource.Success -> {
                             Text("¡Sala encontrada! Entrando...", color = Color.Green)
                         }
+                        is Resource.Idle -> {}
                     }
                 }
             }

@@ -30,7 +30,7 @@ class PuraCaspaRemoteDataSourceImpl(
     override suspend fun createParty(
         customId: String,
         partyData: PartyData
-    ): Resource<String> {
+    ): Resource<Unit> {
         return try {
             val roomRef = db.collection("salas").document(customId)
 
@@ -44,7 +44,7 @@ class PuraCaspaRemoteDataSourceImpl(
             val roomWithId = partyData.copy(id = customId)
             roomRef.set(roomWithId).await()
 
-            Resource.Success(customId)
+            Resource.Success(Unit)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "Error al conectar con Firebase")
         }

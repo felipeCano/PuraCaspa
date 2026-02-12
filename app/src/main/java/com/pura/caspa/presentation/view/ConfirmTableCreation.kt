@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,6 +43,14 @@ fun ConfirmTableCreation(
 ) {
     var idTableCreation by remember { mutableStateOf("") }
     val state by viewModel.createPartyState.collectAsState()
+
+    LaunchedEffect(state){
+        if(state is Resource.Success){
+            onNavigateToPuraCaspaGameView(idTableCreation)
+            viewModel.resetState()
+        }
+    }
+
     TitleFrame("Create Name Party") {
         Box(
             modifier = modifier
@@ -77,20 +86,16 @@ fun ConfirmTableCreation(
                     colors = textFieldColors(),
                     shape = RoundedCornerShape(12.dp)
                 )
-                if (state.message != null || state.data != null) {
-                    //Handle state
-                    when (state) {
+                state?.let {currentState ->
+                    when (currentState) {
                         is Resource.Loading -> {
-                            CircularProgressIndicator()
+                            CircularProgressIndicator(color = colorResource(R.color.gold_border))
                         }
-
-                        is Resource.Error -> Text(state.message ?: "Error", color = Color.Red)
+                        is Resource.Error -> Text(state!!.message ?: "Error", color = Color.Red)
                         is Resource.Success -> {
-                            Text("Sala '${state.data}' creada con éxito", color = Color.Green)
-                            onNavigateToPuraCaspaGameView(idTableCreation)
+                            Text("Sala '${state!!.data}' creada con éxito", color = Color.Green)
                         }
-
-                        else -> {}
+                        is Resource.Idle -> {}
                     }
                 }
             }
