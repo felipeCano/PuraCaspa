@@ -29,12 +29,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.pura.caspa.R
 import com.pura.caspa.compose.PuraCaspaButton
 import com.pura.caspa.compose.TitleFrame
 import com.pura.caspa.data.util.Resource
@@ -71,7 +73,7 @@ fun PuraCaspaGameView(
         }
     }
 
-    TitleFrame("Sala:\n", nameTable) { paddingValues ->
+    TitleFrame(stringResource(R.string.party), nameTable) { paddingValues ->
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -109,13 +111,13 @@ fun PuraCaspaGameView(
                                 ) {
                                     if (isImpostor) {
                                         Text(
-                                            text = "¡ERES EL",
+                                            text = stringResource(R.string.you_are_the),
                                             color = Color.Red,
                                             fontSize = 24.sp,
                                             fontWeight = FontWeight.Bold
                                         )
                                         Text(
-                                            text = "IMPOSTOR!",
+                                            text = stringResource(R.string.imposter),
                                             color = Color.Red,
                                             fontSize = 48.sp,
                                             fontWeight = FontWeight.Black,
@@ -123,13 +125,13 @@ fun PuraCaspaGameView(
                                         )
                                         Spacer(modifier = Modifier.height(16.dp))
                                         Text(
-                                            text = "Miente para sobrevivir",
+                                            text = stringResource(R.string.lie_to_survive),
                                             style = MaterialTheme.typography.bodyLarge,
                                             color = Color.Gray
                                         )
                                     } else {
                                         Text(
-                                            text = "Tu palabra es:",
+                                            text = stringResource(R.string.your_word_is),
                                             fontSize = 18.sp,
                                             color = Color.Gray,
                                             fontWeight = FontWeight.Medium
@@ -151,7 +153,7 @@ fun PuraCaspaGameView(
                         } else {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
-                                    "Esperando inicio...",
+                                    stringResource(R.string.waiting_to_start),
                                     style = MaterialTheme.typography.headlineSmall,
                                     modifier = Modifier.padding(bottom = 20.dp)
                                 )
@@ -161,7 +163,7 @@ fun PuraCaspaGameView(
                                 ) {
                                     Column(modifier = Modifier.padding(24.dp)) {
                                         Text(
-                                            "Jugadores (${integrantes.size}):",
+                                            stringResource(R.string.players_waiting) +" (${integrantes.size}):",
                                             fontWeight = FontWeight.Bold
                                         )
                                         Spacer(modifier = Modifier.height(8.dp))
@@ -179,7 +181,7 @@ fun PuraCaspaGameView(
                     Spacer(modifier = Modifier.weight(0.2f))
                     if (isHost) {
                         PuraCaspaButton(
-                            text = "COMPARTIR SALA",
+                            text = stringResource(R.string.share_room),
                             onClick = {
                                 viewModel.onShareClicked(nameTable)
                             },
@@ -196,7 +198,7 @@ fun PuraCaspaGameView(
 
 
                         PuraCaspaButton(
-                            text = if (partyData.stateParty == "waiting") "INICIAR JUEGO" else "SIGUIENTE PALABRA",
+                            text = if (partyData.stateParty == "waiting") stringResource(R.string.start_game) else stringResource(R.string.next_word),
                             onClick = {
                                 viewModel.onStartGameClicked(nameTable)
                                 isVisible = false
@@ -230,8 +232,9 @@ fun PuraCaspaGameView(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
+                                val errorText = state.message?.asString(context)?: ""
                                 Text(
-                                    text = state.message ?: "Error",
+                                    text = errorText.ifEmpty { "Error Desconocido" },
                                     color = Color.Red,
                                     fontSize = 28.sp,
                                     lineHeight = 34.sp,

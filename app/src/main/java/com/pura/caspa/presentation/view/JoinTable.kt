@@ -60,7 +60,7 @@ fun JoinTable(
         viewModel.getName()
     }
 
-    TitleFrame("Party Name To Join") {
+    TitleFrame(stringResource(R.string.join_the_room)) {
         Box(
             modifier = modifier
                 .fillMaxSize()
@@ -105,7 +105,7 @@ fun JoinTable(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
                 Text(
-                    text = "Ingresa el nombre de la sala",
+                    text = stringResource(id = R.string.enter_the_room_name),
                     color = Color.LightGray,
                     modifier = Modifier
                         .align(Alignment.Start)
@@ -136,7 +136,8 @@ fun JoinTable(
                         }
 
                         is Resource.Error -> {
-                            Text(currentState.message ?: "Error", color = Color.Red)
+                            val errorText = currentState.message?.asString(context) ?: ""
+                            Text(errorText.ifEmpty { "Error desconocido" }, color = Color.Red)
                         }
 
                         is Resource.Success -> {
@@ -158,11 +159,12 @@ fun JoinTable(
                     text = stringResource(id = R.string.join_table),
                     enabled = true,
                     onClick = {
+                        val showError = R.string.field_cant_be_empty
                         val finalName = if (userName.isEmpty()) nameState else userName
                         if (finalName.isBlank() || roomIdInput.isBlank()) {
                             Toast.makeText(
                                 context,
-                                "Debes ingresar un nombre y un código de sala",
+                                showError,
                                 Toast.LENGTH_SHORT
                             ).show()
                         } else {

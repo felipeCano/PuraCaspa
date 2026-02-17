@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -43,15 +44,16 @@ fun ConfirmTableCreation(
 ) {
     var idTableCreation by remember { mutableStateOf("") }
     val state by viewModel.createPartyState.collectAsState()
+    val context = LocalContext.current
 
-    LaunchedEffect(state){
-        if(state is Resource.Success){
+    LaunchedEffect(state) {
+        if (state is Resource.Success) {
             onNavigateToPuraCaspaGameView(idTableCreation)
             viewModel.resetState()
         }
     }
 
-    TitleFrame("Create Name Party") {
+    TitleFrame(stringResource(R.string.create_table)) {
         Box(
             modifier = modifier
                 .fillMaxSize()
@@ -64,17 +66,19 @@ fun ConfirmTableCreation(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "Ingresa el nombre de la sala",
+                    text = stringResource(id = R.string.enter_the_room_name),
                     color = Color.LightGray,
-                    modifier = Modifier.align(Alignment.Start).padding(start = 8.dp)
+                    modifier = Modifier
+                        .align(Alignment.Start)
+                        .padding(start = 8.dp)
                 )
 
                 TextField(
                     value = idTableCreation,
-                    onValueChange = {input->
-                        val cleanText = input.filter{!it.isWhitespace()}
+                    onValueChange = { input ->
+                        val cleanText = input.filter { !it.isWhitespace() }
                         idTableCreation = cleanText
-                                    },
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp)
@@ -86,15 +90,22 @@ fun ConfirmTableCreation(
                     colors = textFieldColors(),
                     shape = RoundedCornerShape(12.dp)
                 )
-                state?.let {currentState ->
+                state?.let { currentState ->
                     when (currentState) {
                         is Resource.Loading -> {
                             CircularProgressIndicator(color = colorResource(R.color.gold_border))
                         }
-                        is Resource.Error -> Text(state!!.message ?: "Error", color = Color.Red)
+
+                        is Resource.Error -> {
+                            val errorText = currentState.message?.asString(context) ?: ""
+
+                            Text(errorText.ifEmpty { "Error desconocido" }, color = Color.Red)
+                        }
+
                         is Resource.Success -> {
                             Text("Sala '${state!!.data}' creada con éxito", color = Color.Green)
                         }
+
                         is Resource.Idle -> {}
                     }
                 }

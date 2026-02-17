@@ -7,4 +7,24 @@
     <string name="welcome_to_puracaspa">Welcome to Pura Caspa</string>
     <string name="confirm_table_creation">Confirm Party</string>
     <string name="join_table">Join Table</string>
+    <string name="party_already_exist">The party %1$s It already exists. Try another name.</string>
+    <string name="firebase_error">Error to conect with Firebase</string>
+    <string name="words_not_found">Words not found</string>
+    <string name="without_words">Without words</string>
+    <string name="table_name_not_blank">The table name can\'t be empty</string>
+    <string name="party">Party:\n</string>
+    <string name="error_to_listen_party">Error to listen party</string>
+    <string name="party_cant_be_empty">Party name can\'t be empty</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="enter_the_room_name">Enter the room name</string>
+    <string name="field_cant_be_empty">You must enter a name and a room code</string>
+    <string name="start_game">START GAME</string>
+    <string name="next_word">NEXT WORD</string>
+    <string name="share_room">SHARE ROOM</string>
+    <string name="waiting_to_start">Waiting to start...</string>
+    <string name="players_waiting">Players</string>
+    <string name="your_word_is">Your word is:</string>
+    <string name="lie_to_survive">Lie to survive</string>
+    <string name="imposter">IMPOSTOR!</string>
+    <string name="you_are_the">You are the</string>
 </resources>

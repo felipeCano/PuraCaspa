@@ -2,11 +2,14 @@ package com.pura.caspa.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pura.caspa.R
 import com.pura.caspa.data.util.Resource
+import com.pura.caspa.data.util.UiText
 import com.pura.caspa.domain.repository.PuraCaspaRepository
 import com.pura.caspa.domain.usecase.GetUserNameUseCase
 import com.pura.caspa.domain.usecase.JoinPartyUseCase
 import com.pura.caspa.domain.usecase.SaveUserNameUseCase
+import com.pura.caspa.presentation.util.toUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,13 +40,23 @@ class JoinTableViewModel @Inject constructor(
 
     fun joinToRoom(roomId: String) {
         if (roomId.isBlank()) {
-            _joinState.value = Resource.Error("Debes ingresar un código de sala")
+            _joinState.value = Resource.Error(null, UiText.StringResource(R.string.party_cant_be_empty))
             return
         }
 
         viewModelScope.launch {
             _joinState.value = Resource.Loading()
-            _joinState.value = joinPartyUseCase(roomId)
+            val result = joinPartyUseCase(roomId)
+            _joinState.value = when(result){
+                is Resource.Error -> {
+                    val finalMessage = result.partyError?.toUiText(args = roomId)
+                        ?: result.message
+                        ?: UiText.StringResource(R.string.unknown_error)
+
+                    Resource.Error(message = finalMessage)
+                }
+                else -> result
+            }
         }
     }
 

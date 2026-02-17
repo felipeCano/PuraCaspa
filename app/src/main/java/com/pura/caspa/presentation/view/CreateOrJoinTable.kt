@@ -41,7 +41,7 @@ fun CreateOrJoinTable(
     val nameState by viewModel.nameState.collectAsState()
     val context = LocalContext.current
 
-    TitleFrame("Welcome to", "Pura Caspa") { paddongValues ->
+    TitleFrame(stringResource(R.string.welcome_to_puracaspa)) { paddongValues ->
         Box(
             modifier = modifier
                 .fillMaxSize()

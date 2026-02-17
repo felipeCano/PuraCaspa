@@ -8,4 +8,24 @@
     <string name="welcome_to_puracaspa">Bienvenidos a Pura Caspa</string>
     <string name="confirm_table_creation">Confirmar Sala</string>
     <string name="join_table">Unirse a la sala</string>
+    <string name="party_already_exist">La sala %1$s ya existe. Intenta con otro nombre.</string>
+    <string name="firebase_error">Error al conectar con Firebase</string>
+    <string name="words_not_found">No se encontraron palabras</string>
+    <string name="without_words">Se agotaron las palabras</string>
+    <string name="table_name_not_blank">El nombre de la sala no puede estar vacío</string>
+    <string name="party">Sala:\n</string>
+    <string name="error_to_listen_party">Error al escuchar la sala</string>
+    <string name="party_cant_be_empty">Debes ingresar un código de sala</string>
+    <string name="unknown_error">Error desconocido</string>
+    <string name="enter_the_room_name">Ingresa el nombre de la sala</string>
+    <string name="field_cant_be_empty">Debes ingresar un nombre y un código de sala</string>
+    <string name="start_game">INICIAR JUEGO</string>
+    <string name="next_word">SIGUIENTE PALABRA</string>
+    <string name="share_room">COMPARTIR SALA</string>
+    <string name="waiting_to_start">Esperando inicio...</string>
+    <string name="players_waiting">Jugadores</string>
+    <string name="your_word_is">Tu palabra es:</string>
+    <string name="lie_to_survive">Miente para sobrevivir</string>
+    <string name="imposter">IMPOSTER!</string>
+    <string name="you_are_the">"Eres el "</string>
 </resources>

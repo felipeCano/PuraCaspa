@@ -1,12 +1,16 @@
 package com.pura.caspa.data.repository.dataSourceImpl
 
+import androidx.compose.ui.res.stringResource
 import com.google.firebase.firestore.FirebaseFirestore
+import com.pura.caspa.R
 import com.pura.caspa.data.model.PartyData
 import com.pura.caspa.data.model.Player
 import com.pura.caspa.data.model.Words
 import com.pura.caspa.data.remote.dataSource.InstallationIdProvider
 import com.pura.caspa.data.repository.dataSource.PuraCaspaRemoteDataSource
+import com.pura.caspa.data.util.PartyError
 import com.pura.caspa.data.util.Resource
+import com.pura.caspa.data.util.UiText
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -37,7 +41,7 @@ class PuraCaspaRemoteDataSourceImpl(
             // We check if the room already exists
             val snapshot = roomRef.get().await()
             if (snapshot.exists()) {
-                return Resource.Error("La sala '$customId' ya existe. Intenta con otro nombre.")
+                return Resource.Error(PartyError.ALREADY_EXISTS)
             }
 
             // If it does not exist, we save the room with that manual ID
@@ -46,7 +50,9 @@ class PuraCaspaRemoteDataSourceImpl(
 
             Resource.Success(Unit)
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "Error al conectar con Firebase")
+            val errorEnum = if (e.localizedMessage == null) PartyError.FIREBASE_ERROR else null
+            val dynamicMsg = e.localizedMessage?.let { UiText.DynamicString(it) }
+            Resource.Error(errorEnum, dynamicMsg)
         }
     }
 
@@ -87,7 +93,9 @@ class PuraCaspaRemoteDataSourceImpl(
             }.await()
             Resource.Success(Unit)
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "Error al unirse a la sala")
+            val errorEnum = if (e.localizedMessage == null) PartyError.FIREBASE_ERROR else null
+            val dynamicMsg = e.localizedMessage?.let { UiText.DynamicString(it) }
+            Resource.Error(errorEnum,dynamicMsg)
         }
     }
 
@@ -98,7 +106,9 @@ class PuraCaspaRemoteDataSourceImpl(
         // Listen in realTime our document
         val subscription = roomRef.addSnapshotListener { snapshot, error ->
             if (error != null) {
-                trySend(Resource.Error(error.message ?: "Error al escuchar sala"))
+                val errorEnum = if (error.localizedMessage == null) PartyError.ERROR_TO_LISTEN_PARTY else null
+                val dynamicMsg = error.localizedMessage?.let { UiText.DynamicString(it) }
+                trySend(Resource.Error(errorEnum,dynamicMsg))
                 return@addSnapshotListener
             }
 
@@ -133,7 +143,9 @@ class PuraCaspaRemoteDataSourceImpl(
                 ).await()
             Resource.Success(Unit)
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "Error al actualizar la partida")
+            val errorEnum = if (e.localizedMessage == null) PartyError.FIREBASE_ERROR else null
+            val dynamicMsg = e.localizedMessage?.let { UiText.DynamicString(it) }
+            Resource.Error(errorEnum,dynamicMsg)
         }
     }
 

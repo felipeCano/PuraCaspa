@@ -1,6 +1,7 @@
 package com.pura.caspa.domain.usecase
 
 import com.pura.caspa.data.model.Player
+import com.pura.caspa.data.util.PartyError
 import com.pura.caspa.data.util.Resource
 import com.pura.caspa.domain.repository.PuraCaspaRepository
 
@@ -13,7 +14,7 @@ class StartGameUseCase(private val puraCaspaRepository: PuraCaspaRepository) {
         //1. We get the words from the repository
         val wordsResult = puraCaspaRepository.getWordstoPlay()
         if (wordsResult !is Resource.Success) {
-            return Resource.Error("Error al obtener palabras")
+            return Resource.Error(partyError = PartyError.WORDS_NOT_FOUND)
         }
 
         //2. Filter: We use the list of words that comes from the repository
@@ -23,7 +24,7 @@ class StartGameUseCase(private val puraCaspaRepository: PuraCaspaRepository) {
         }
 
         if (availableWords.isEmpty()) {
-            return Resource.Error("¡Se agotaron las palabras!")
+            return Resource.Error(PartyError.WITHOUT_WORDS)
         }
 
         //3. Random

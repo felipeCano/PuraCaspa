@@ -6,7 +6,9 @@ import com.pura.caspa.data.model.Player
 import com.pura.caspa.data.model.Words
 import com.pura.caspa.data.remote.dataSource.InstallationIdProvider
 import com.pura.caspa.data.repository.dataSource.PuraCaspaRemoteDataSource
+import com.pura.caspa.data.util.PartyError
 import com.pura.caspa.data.util.Resource
+import com.pura.caspa.data.util.UiText
 import com.pura.caspa.domain.repository.PuraCaspaRepository
 import kotlinx.coroutines.flow.Flow
 
@@ -21,7 +23,9 @@ class PuraCaspaRepositoryImpl(
             val data = puraCaspaRemoteDataSource.fetchWords()
             Resource.Success(data)
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "Error desconocido")
+            val errorEnum = if (e.localizedMessage == null) PartyError.FIREBASE_ERROR else null
+            val dynamicMsg = e.localizedMessage?.let { UiText.DynamicString(it) }
+            Resource.Error(errorEnum,dynamicMsg)
         }
     }
 

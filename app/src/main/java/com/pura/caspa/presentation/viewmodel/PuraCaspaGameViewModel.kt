@@ -2,13 +2,16 @@ package com.pura.caspa.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pura.caspa.R
 import com.pura.caspa.data.model.PartyData
 import com.pura.caspa.data.util.Resource
+import com.pura.caspa.data.util.UiText
 import com.pura.caspa.domain.usecase.GetInstallationIdUseCase
 import com.pura.caspa.domain.usecase.GetPartyDataUseCase
 import com.pura.caspa.domain.usecase.GetUserNameUseCase
 import com.pura.caspa.domain.usecase.SharePartyIDUseCase
 import com.pura.caspa.domain.usecase.StartGameUseCase
+import com.pura.caspa.presentation.util.toUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -79,7 +82,11 @@ class PuraCaspaGameViewModel @Inject constructor(
 
                 when (result) {
                     is Resource.Error -> {
-                        _partyData.value = Resource.Error(result.message ?: "Error desconocido")
+                        val finalMessage = result.partyError?.toUiText(args = roomId)
+                            ?: result.message
+                            ?: UiText.StringResource(R.string.unknown_error)
+
+                        _partyData.value = Resource.Error(message = finalMessage)
                     }
                     is Resource.Success -> {
                     }
