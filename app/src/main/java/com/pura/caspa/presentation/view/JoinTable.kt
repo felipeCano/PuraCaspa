@@ -141,7 +141,7 @@ fun JoinTable(
                         }
 
                         is Resource.Success -> {
-                            Text("¡Sala encontrada! Entrando...", color = Color.Green)
+                            Text(stringResource(R.string.room_found), color = Color.Green)
                         }
                         is Resource.Idle -> {}
                     }

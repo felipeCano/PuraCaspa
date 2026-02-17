@@ -28,4 +28,6 @@
     <string name="lie_to_survive">Miente para sobrevivir</string>
     <string name="imposter">IMPOSTER!</string>
     <string name="you_are_the">"Eres el "</string>
+    <string name="room_created_successfully">Sala %1$s creada con éxito</string>
+    <string name="room_found">¡Sala encontrada! Entrando...</string>
 </resources>

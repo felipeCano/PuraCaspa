@@ -27,4 +27,6 @@
     <string name="lie_to_survive">Lie to survive</string>
     <string name="imposter">IMPOSTOR!</string>
     <string name="you_are_the">You are the</string>
+    <string name="room_created_successfully">Room %1$s created successfully</string>
+    <string name="room_found">Room found! Entering...</string>
 </resources>
