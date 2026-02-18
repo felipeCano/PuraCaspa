@@ -27,7 +27,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.pura.caspa.R
-import com.pura.caspa.compose.BlueCircularProgress
 import com.pura.caspa.compose.PuraCaspaButton
 import com.pura.caspa.compose.TitleFrame
 import com.pura.caspa.compose.textFieldColors
@@ -88,24 +87,25 @@ fun ConfirmTableCreation(
                     colors = textFieldColors(),
                     shape = RoundedCornerShape(12.dp)
                 )
-            }
-            state?.let { currentState ->
-                when (currentState) {
-                    is Resource.Loading -> {
-                        BlueCircularProgress(modifier)
+                state?.let { currentState ->
+                    when (currentState) {
+                        is Resource.Loading -> {
+                            CircularProgressIndicator(
+                                color = colorResource(R.color.blue)
+                            )
+                        }
+                        is Resource.Error -> {
+                            val errorText = currentState.message?.asString(context) ?: ""
+
+                            Text(errorText.ifEmpty { "Error desconocido" }, color = Color.Red)
+                        }
+
+                        is Resource.Success -> {
+                            Text(stringResource(R.string.room_created_successfully, "'$idTableCreation'"), color = Color.Green)
+                        }
+
+                        is Resource.Idle -> {}
                     }
-
-                    is Resource.Error -> {
-                        val errorText = currentState.message?.asString(context) ?: ""
-
-                        Text(errorText.ifEmpty { "Error desconocido" }, color = Color.Red)
-                    }
-
-                    is Resource.Success -> {
-                        Text(stringResource(R.string.room_created_successfully, "'$idTableCreation'"), color = Color.Green)
-                    }
-
-                    is Resource.Idle -> {}
                 }
             }
             Column(
