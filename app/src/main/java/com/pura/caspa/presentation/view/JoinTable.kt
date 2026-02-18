@@ -114,7 +114,10 @@ fun JoinTable(
                 TextField(
                     value = roomIdInput,
                     onValueChange = { input ->
-                        val cleanText = input.filter { !it.isWhitespace() }
+                        val cleanText = input.filter { char ->
+                            char.isLetterOrDigit() ||
+                                    char == '-' || char == '_'
+                        }
                         roomIdInput = cleanText
                     },
                     modifier = Modifier

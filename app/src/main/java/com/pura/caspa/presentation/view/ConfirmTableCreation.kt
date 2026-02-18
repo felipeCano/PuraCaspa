@@ -42,6 +42,7 @@ fun ConfirmTableCreation(
     var idTableCreation by remember { mutableStateOf("") }
     val state by viewModel.createPartyState.collectAsState()
     val context = LocalContext.current
+    val pattern = remember { Regex("[a-zA-Z0-9]*") }
 
     LaunchedEffect(state) {
         if (state is Resource.Success) {
@@ -73,7 +74,10 @@ fun ConfirmTableCreation(
                 TextField(
                     value = idTableCreation,
                     onValueChange = { input ->
-                        val cleanText = input.filter { !it.isWhitespace() }
+                        val cleanText = input.filter { char ->
+                            char.isLetterOrDigit() ||
+                                    char == '-' || char == '_'
+                        }
                         idTableCreation = cleanText
                     },
                     modifier = Modifier
@@ -94,6 +98,7 @@ fun ConfirmTableCreation(
                                 color = colorResource(R.color.blue)
                             )
                         }
+
                         is Resource.Error -> {
                             val errorText = currentState.message?.asString(context) ?: ""
 
@@ -101,7 +106,12 @@ fun ConfirmTableCreation(
                         }
 
                         is Resource.Success -> {
-                            Text(stringResource(R.string.room_created_successfully, "'$idTableCreation'"), color = Color.Green)
+                            Text(
+                                stringResource(
+                                    R.string.room_created_successfully,
+                                    "'$idTableCreation'"
+                                ), color = Color.Green
+                            )
                         }
 
                         is Resource.Idle -> {}
