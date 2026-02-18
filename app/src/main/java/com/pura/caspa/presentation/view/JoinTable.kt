@@ -1,7 +1,9 @@
 package com.pura.caspa.presentation.view
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,10 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.pura.caspa.R
+import com.pura.caspa.compose.BlueCircularProgress
 import com.pura.caspa.compose.PuraCaspaButton
 import com.pura.caspa.compose.TitleFrame
 import com.pura.caspa.compose.textFieldColors
@@ -129,22 +130,23 @@ fun JoinTable(
                     colors = textFieldColors(),
                     shape = RoundedCornerShape(12.dp)
                 )
-                state?.let { currentState ->
-                    when (currentState) {
-                        is Resource.Loading -> {
-                            CircularProgressIndicator(color = colorResource(R.color.gold_border))
-                        }
-
-                        is Resource.Error -> {
-                            val errorText = currentState.message?.asString(context) ?: ""
-                            Text(errorText.ifEmpty { "Error desconocido" }, color = Color.Red)
-                        }
-
-                        is Resource.Success -> {
-                            Text(stringResource(R.string.room_found), color = Color.Green)
-                        }
-                        is Resource.Idle -> {}
+            }
+            state?.let { currentState ->
+                when (currentState) {
+                    is Resource.Loading -> {
+                        BlueCircularProgress(modifier)
                     }
+
+                    is Resource.Error -> {
+                        val errorText = currentState.message?.asString(context) ?: ""
+                        Text(errorText.ifEmpty { "Error desconocido" }, color = Color.Red)
+                    }
+
+                    is Resource.Success -> {
+                        Text(stringResource(R.string.room_found), color = Color.Green)
+                    }
+
+                    is Resource.Idle -> {}
                 }
             }
             Column(

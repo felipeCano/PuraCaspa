@@ -26,7 +26,7 @@
     <string name="players_waiting">Jugadores</string>
     <string name="your_word_is">Tu palabra es:</string>
     <string name="lie_to_survive">Miente para sobrevivir</string>
-    <string name="imposter">IMPOSTER!</string>
+    <string name="imposter">IMPOSTOR!</string>
     <string name="you_are_the">"Eres el "</string>
     <string name="room_created_successfully">Sala %1$s creada con éxito</string>
     <string name="room_found">¡Sala encontrada! Entrando...</string>

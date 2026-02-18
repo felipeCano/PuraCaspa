@@ -159,11 +159,15 @@ fun PuraCaspaGameView(
                                 )
                                 Card(
                                     modifier = Modifier.fillMaxWidth(0.9f),
-                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                    )
                                 ) {
                                     Column(modifier = Modifier.padding(24.dp)) {
                                         Text(
-                                            stringResource(R.string.players_waiting) +" (${integrantes.size}):",
+                                            stringResource(
+                                                R.string.players_waiting
+                                            ) + " (${integrantes.size}):",
                                             fontWeight = FontWeight.Bold
                                         )
                                         Spacer(modifier = Modifier.height(8.dp))
@@ -198,7 +202,11 @@ fun PuraCaspaGameView(
 
 
                         PuraCaspaButton(
-                            text = if (partyData.stateParty == "waiting") stringResource(R.string.start_game) else stringResource(R.string.next_word),
+                            text = if (partyData.stateParty == "waiting") stringResource(
+                                R.string.start_game
+                            ) else stringResource(
+                                R.string.next_word
+                            ),
                             onClick = {
                                 viewModel.onStartGameClicked(nameTable)
                                 isVisible = false
@@ -232,7 +240,7 @@ fun PuraCaspaGameView(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
-                                val errorText = state.message?.asString(context)?: ""
+                                val errorText = state.message?.asString(context) ?: ""
                                 Text(
                                     text = errorText.ifEmpty { "Error Desconocido" },
                                     color = Color.Red,
@@ -246,7 +254,8 @@ fun PuraCaspaGameView(
                     }
                     Spacer(modifier = Modifier.weight(0.2f))
                 }
-                is Resource.Idle ->{}
+
+                is Resource.Idle -> {}
             }
         }
     }
