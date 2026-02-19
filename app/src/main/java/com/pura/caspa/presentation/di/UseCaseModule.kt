@@ -7,6 +7,7 @@ import com.pura.caspa.domain.usecase.GetPartyDataUseCase
 import com.pura.caspa.domain.usecase.GetUserNameUseCase
 import com.pura.caspa.domain.usecase.GetWordsToPlayUseCase
 import com.pura.caspa.domain.usecase.JoinPartyUseCase
+import com.pura.caspa.domain.usecase.ResetPlayersVotesUseCase
 import com.pura.caspa.domain.usecase.RevealImpostorUseCase
 import com.pura.caspa.domain.usecase.SaveUserNameUseCase
 import com.pura.caspa.domain.usecase.SharePartyIDUseCase
@@ -117,5 +118,13 @@ class UseCaseModule {
         puraCaspaRepository: PuraCaspaRepository
     ): RevealImpostorUseCase {
         return RevealImpostorUseCase(puraCaspaRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideResetPlayersVotesUseCase(
+        puraCaspaRepository: PuraCaspaRepository
+    ): ResetPlayersVotesUseCase {
+        return ResetPlayersVotesUseCase(puraCaspaRepository)
     }
 }

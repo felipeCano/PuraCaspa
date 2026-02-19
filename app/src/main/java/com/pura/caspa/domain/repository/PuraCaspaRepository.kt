@@ -40,4 +40,7 @@ interface PuraCaspaRepository {
 
     //Reveal Imposter
     suspend fun revealImpostor(roomId: String, reveal: Boolean): Resource<Unit>
+
+    //ResetVoting
+    suspend fun resetPlayersVotes(roomId: String): Resource<Unit>
 }

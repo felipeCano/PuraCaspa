@@ -93,4 +93,9 @@ class PuraCaspaRepositoryImpl(
     override suspend fun revealImpostor(roomId: String, reveal: Boolean): Resource<Unit> {
         return puraCaspaRemoteDataSource.revealImpostor(roomId, reveal)
     }
+
+    //ResetVoting
+    override suspend fun resetPlayersVotes(roomId: String): Resource<Unit> {
+        return puraCaspaRemoteDataSource.resetPlayersVotes(roomId)
+    }
 }

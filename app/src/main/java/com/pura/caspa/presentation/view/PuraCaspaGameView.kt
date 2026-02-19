@@ -1,7 +1,6 @@
 package com.pura.caspa.presentation.view
 
 import android.content.Intent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -54,16 +53,13 @@ fun PuraCaspaGameView(
 ) {
     val roomState by viewModel.partyData.collectAsState()
     val myId by viewModel.myId.collectAsState()
-    var isVisible by remember { mutableStateOf(true) }
-    var isVisibleVoting by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val messageToShare by viewModel.shareMessage.collectAsState()
     var selectedPlayerId by remember { mutableStateOf("") }
     val hasVoted by viewModel.hasVoted.collectAsState()
-    var isVotingOver by remember { mutableStateOf(false) }
     val stateParty = (roomState as? Resource.Success)?.data?.stateParty
-
-
+    val isVotingComplete by viewModel.isVotingComplete.collectAsState()
+    val votingProgress by viewModel.votingProgress.collectAsState()
 
     LaunchedEffect(key1 = nameTable) {
         viewModel.listenToRoom(nameTable)
@@ -289,57 +285,49 @@ fun PuraCaspaGameView(
                     Spacer(modifier = Modifier.weight(0.2f))
                     if (isHost) {
                         if (partyData?.stateParty == "waiting") {
-                            AnimatedVisibility(visible = isVisible) {
-                                Column {
-                                }
+                            Column {
+                            }
+                            PuraCaspaButton(
+                                text = stringResource(R.string.share_room),
+                                onClick = {
+                                    viewModel.onShareClicked(nameTable)
+                                },
+                                enabled = true,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(64.dp)
+                            )
+                        }
+                        if (partyData!!.stateParty == "jugando") {
+                            Column {
                                 PuraCaspaButton(
-                                    text = stringResource(R.string.share_room),
+                                    text = "INICIAR VOTACION",
                                     onClick = {
-                                        viewModel.onShareClicked(nameTable)
+                                        viewModel.changeStatusToVoting(nameTable)
                                     },
-                                    enabled = isVisible,
+                                    enabled = true,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(64.dp)
                                 )
                             }
                         }
-                        if (partyData!!.stateParty == "jugando") {
-                            AnimatedVisibility(visible = isVisibleVoting) {
-                                Column {
-                                    PuraCaspaButton(
-                                        text = "INICIAR VOTACION",
-                                        onClick = {
-                                            viewModel.changeStatusToVoting(nameTable)
-                                            //isVisibleVoting = false
-                                            isVotingOver = true
-                                        },
-                                        enabled = isVisibleVoting,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(64.dp)
-                                    )
-                                }
-                            }
-                        }
-
-                        if (partyData!!.stateParty == "voting") {
-                            AnimatedVisibility(visible = isVotingOver) {
-                                Column {
-                                    PuraCaspaButton(
-                                        text = "Mostrar Impostor",
-                                        onClick = {
-                                            viewModel.onRevealImpostorClicked(nameTable)
-                                            isVotingOver = false
-                                            isVisibleVoting = true
-                                            revealImpostor = true
-                                        },
-                                        enabled = isVotingOver,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(64.dp)
-                                    )
-                                }
+                        if (partyData?.stateParty == "voting" && !revealImpostor) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                PuraCaspaButton(
+                                    text = "MOSTRAR IMPOSTOR",
+                                    onClick = { viewModel.onRevealImpostorClicked(nameTable) },
+                                    enabled = isVotingComplete,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(64.dp)
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = if (isVotingComplete) "¡Votación terminada!" else "Votos recibidos: $votingProgress",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = if (isVotingComplete) Color(0xFF2E7D32) else Color.Gray
+                                )
                             }
                         }
 
@@ -353,11 +341,8 @@ fun PuraCaspaGameView(
                             ),
                             onClick = {
                                 viewModel.onStartGameClicked(nameTable)
-                                revealImpostor = false
-                                isVisible = false
-                                isVisibleVoting = true
                             },
-                            enabled = integrantes.size >= 2,
+                            enabled = integrantes.size >= 2 && (partyData.stateParty != "voting" || isVotingComplete),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(64.dp),

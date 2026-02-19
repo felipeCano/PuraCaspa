@@ -9,6 +9,7 @@ import com.pura.caspa.data.util.UiText
 import com.pura.caspa.domain.usecase.GetInstallationIdUseCase
 import com.pura.caspa.domain.usecase.GetPartyDataUseCase
 import com.pura.caspa.domain.usecase.GetUserNameUseCase
+import com.pura.caspa.domain.usecase.ResetPlayersVotesUseCase
 import com.pura.caspa.domain.usecase.RevealImpostorUseCase
 import com.pura.caspa.domain.usecase.SharePartyIDUseCase
 import com.pura.caspa.domain.usecase.StartGameUseCase
@@ -17,8 +18,11 @@ import com.pura.caspa.domain.usecase.VoteForPlayerUseCase
 import com.pura.caspa.presentation.util.toUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,7 +35,8 @@ class PuraCaspaGameViewModel @Inject constructor(
     private val sharePartyIDUseCase: SharePartyIDUseCase,
     private val updateToVotingUseCase: UpdateToVotingUseCase,
     private val voteForPlayerUseCase: VoteForPlayerUseCase,
-    private val revealImpostorUseCase: RevealImpostorUseCase
+    private val revealImpostorUseCase: RevealImpostorUseCase,
+    private val resetPlayersVotesUseCase: ResetPlayersVotesUseCase
 ) : ViewModel() {
 
     private val _partyData = MutableStateFlow<Resource<PartyData>>(Resource.Loading())
@@ -83,6 +88,7 @@ class PuraCaspaGameViewModel @Inject constructor(
 
             viewModelScope.launch {
                 revealImpostorUseCase(roomId, false)
+                resetPlayersVotesUseCase(roomId)
                 resetVotingState()
 
                 //3. We call the UseCase passing the required parameters
@@ -161,7 +167,28 @@ class PuraCaspaGameViewModel @Inject constructor(
     //Reveal Imposter
     fun onRevealImpostorClicked(roomId: String) {
         viewModelScope.launch {
-            revealImpostorUseCase(roomId, true) // Activamos el switch global
+            revealImpostorUseCase(roomId, true)
         }
     }
+
+    //Counter Voted
+    //This variable is BOOLEAN to enable the button
+    val isVotingComplete: StateFlow<Boolean> = _partyData.map { resource ->
+        if (resource is Resource.Success) {
+            val data = resource.data
+            val votosRondaActual = data?.votos_en_esta_ronda ?: 0
+            votosRondaActual >= data?.integrantes!!.size
+        } else false
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    //This variable is STRING to show the counter
+    val votingProgress: StateFlow<String> = _partyData.map { resource ->
+        if (resource is Resource.Success) {
+            val data = resource.data
+            val actuales = data?.votos_en_esta_ronda ?: 0
+            val total = data?.integrantes?.size ?: 0
+
+            "$actuales / $total"
+        } else "0 / 0"
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "0 / 0")
 }

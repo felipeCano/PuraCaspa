@@ -19,7 +19,7 @@ import kotlinx.coroutines.tasks.await
 class PuraCaspaRemoteDataSourceImpl(
     private val db: FirebaseFirestore,
     private val installationIdProvider: InstallationIdProvider
-    ) : PuraCaspaRemoteDataSource {
+) : PuraCaspaRemoteDataSource {
 
     override suspend fun fetchWords(): Words {
         return try {
@@ -95,7 +95,7 @@ class PuraCaspaRemoteDataSourceImpl(
         } catch (e: Exception) {
             val errorEnum = if (e.localizedMessage == null) PartyError.FIREBASE_ERROR else null
             val dynamicMsg = e.localizedMessage?.let { UiText.DynamicString(it) }
-            Resource.Error(errorEnum,dynamicMsg)
+            Resource.Error(errorEnum, dynamicMsg)
         }
     }
 
@@ -106,9 +106,10 @@ class PuraCaspaRemoteDataSourceImpl(
         // Listen in realTime our document
         val subscription = roomRef.addSnapshotListener { snapshot, error ->
             if (error != null) {
-                val errorEnum = if (error.localizedMessage == null) PartyError.ERROR_TO_LISTEN_PARTY else null
+                val errorEnum =
+                    if (error.localizedMessage == null) PartyError.ERROR_TO_LISTEN_PARTY else null
                 val dynamicMsg = error.localizedMessage?.let { UiText.DynamicString(it) }
-                trySend(Resource.Error(errorEnum,dynamicMsg))
+                trySend(Resource.Error(errorEnum, dynamicMsg))
                 return@addSnapshotListener
             }
 
@@ -145,7 +146,7 @@ class PuraCaspaRemoteDataSourceImpl(
         } catch (e: Exception) {
             val errorEnum = if (e.localizedMessage == null) PartyError.FIREBASE_ERROR else null
             val dynamicMsg = e.localizedMessage?.let { UiText.DynamicString(it) }
-            Resource.Error(errorEnum,dynamicMsg)
+            Resource.Error(errorEnum, dynamicMsg)
         }
     }
 
@@ -160,7 +161,7 @@ class PuraCaspaRemoteDataSourceImpl(
             //Resource.Error(e.message ?: "Error al cambiar a votación")
             val errorEnum = if (e.localizedMessage == null) PartyError.FIREBASE_ERROR else null
             val dynamicMsg = e.localizedMessage?.let { UiText.DynamicString(it) }
-            Resource.Error(errorEnum,dynamicMsg)
+            Resource.Error(errorEnum, dynamicMsg)
         }
     }
 
@@ -173,14 +174,14 @@ class PuraCaspaRemoteDataSourceImpl(
                 val snapshot = transaction.get(roomRef)
                 val partyData = snapshot.toObject(PartyData::class.java)
                 val integrantes = partyData?.integrantes?.toMutableList() ?: mutableListOf()
-
+                val currentRoundVotes = partyData?.votos_en_esta_ronda ?: 0
                 val playerToUpdate = integrantes.find { it.id == playerVotedId }
 
                 if (playerToUpdate != null) {
                     val index = integrantes.indexOf(playerToUpdate)
                     integrantes[index] = playerToUpdate.copy(votes = playerToUpdate.votes + 1)
-
                     transaction.update(roomRef, "integrantes", integrantes)
+                    transaction.update(roomRef, "votos_en_esta_ronda", currentRoundVotes + 1)
                 }
             }.await()
 
@@ -188,8 +189,7 @@ class PuraCaspaRemoteDataSourceImpl(
         } catch (e: Exception) {
             val errorEnum = if (e.localizedMessage == null) PartyError.FIREBASE_ERROR else null
             val dynamicMsg = e.localizedMessage?.let { UiText.DynamicString(it) }
-            Resource.Error(errorEnum,dynamicMsg)
-            //Resource.Error(e.message ?: "Error al registrar el voto")
+            Resource.Error(errorEnum, dynamicMsg)
         }
     }
 
@@ -203,9 +203,22 @@ class PuraCaspaRemoteDataSourceImpl(
         } catch (e: Exception) {
             val errorEnum = if (e.localizedMessage == null) PartyError.FIREBASE_ERROR else null
             val dynamicMsg = e.localizedMessage?.let { UiText.DynamicString(it) }
-            Resource.Error(errorEnum,dynamicMsg)
+            Resource.Error(errorEnum, dynamicMsg)
             //Resource.Error(e.message ?: "Error al revelar impostor")
         }
     }
 
+    //ResetVotin
+    override suspend fun resetPlayersVotes(roomId: String): Resource<Unit> {
+        return try {
+            db.collection("salas").document(roomId)
+                .update("votos_en_esta_ronda", 0).await()
+            Resource.Success(Unit)
+        } catch (e: Exception) {
+            val errorEnum = if (e.localizedMessage == null) PartyError.FIREBASE_ERROR else null
+            val dynamicMsg = e.localizedMessage?.let { UiText.DynamicString(it) }
+            Resource.Error(errorEnum, dynamicMsg)
+            //Resource.Error(e.localizedMessage ?: "Error al reiniciar contador de ronda")
+        }
+    }
 }
