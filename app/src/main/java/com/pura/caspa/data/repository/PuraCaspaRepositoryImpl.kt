@@ -40,7 +40,8 @@ class PuraCaspaRepositoryImpl(
         val newRoom = PartyData(
             host_id = installationId,
             integrantes = listOf(Player(id = installationId, name = userName)),
-            stateParty = "waiting"
+            stateParty = "waiting",
+            showImpostor = false
         )
         return puraCaspaRemoteDataSource.createParty(customId, newRoom)
     }
@@ -81,5 +82,15 @@ class PuraCaspaRepositoryImpl(
     //Updated PartyState
     override suspend fun updateToVotingStatus(roomId: String): Resource<Unit> {
         return puraCaspaRemoteDataSource.updateToVotingStatus(roomId)
+    }
+
+    //Voting
+    override suspend fun voteForPlayer(roomId: String, playerVotedId: String): Resource<Unit> {
+        return puraCaspaRemoteDataSource.voteForPlayer(roomId, playerVotedId)
+    }
+
+    //Reveal Imposter
+    override suspend fun revealImpostor(roomId: String, reveal: Boolean): Resource<Unit> {
+        return puraCaspaRemoteDataSource.revealImpostor(roomId, reveal)
     }
 }

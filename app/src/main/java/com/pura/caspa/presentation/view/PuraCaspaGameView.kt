@@ -59,7 +59,11 @@ fun PuraCaspaGameView(
     val context = LocalContext.current
     val messageToShare by viewModel.shareMessage.collectAsState()
     var selectedPlayerId by remember { mutableStateOf("") }
-    var isVoteButtonEnabled by remember { mutableStateOf(true) }
+    val hasVoted by viewModel.hasVoted.collectAsState()
+    var isVotingOver by remember { mutableStateOf(false) }
+    val stateParty = (roomState as? Resource.Success)?.data?.stateParty
+
+
 
     LaunchedEffect(key1 = nameTable) {
         viewModel.listenToRoom(nameTable)
@@ -78,16 +82,18 @@ fun PuraCaspaGameView(
         }
     }
 
-    LaunchedEffect(roomState) {
-        if (roomState is Resource.Success) {
-            val partyData = roomState.data
-            if (partyData?.stateParty == "voting") {
-                selectedPlayerId = ""
-                isVoteButtonEnabled = true
-            }
+    LaunchedEffect(key1 = stateParty) {
+        if (stateParty == "voting") {
+            selectedPlayerId = ""
         }
     }
 
+    LaunchedEffect(key1 = stateParty) {
+        if (stateParty != "voting" && stateParty != null) {
+            viewModel.resetVotingState()
+            selectedPlayerId = ""
+        }
+    }
     TitleFrame(stringResource(R.string.party), nameTable) { paddingValues ->
         Column(
             modifier = modifier
@@ -101,6 +107,7 @@ fun PuraCaspaGameView(
                     val partyData = state.data
                     val integrantes = partyData?.integrantes ?: emptyList()
                     val isHost = partyData?.host_id == myId
+                    var revealImpostor = partyData?.showImpostor ?: false
 
                     Box(
                         modifier = Modifier
@@ -166,45 +173,85 @@ fun PuraCaspaGameView(
                                 }
                             }
                         } else if (partyData?.stateParty == "voting") {
-                            Column(
-                                modifier = Modifier.fillMaxSize(),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                LazyColumn(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                                    contentPadding = PaddingValues(vertical = 16.dp)
+                            if (!revealImpostor) {
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    items(
-                                        items = integrantes,
-                                        { player -> player.id }) { integrante ->
-                                        val isSelected = integrante.id == selectedPlayerId
+                                    Card(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        shape = RoundedCornerShape(32.dp),
+                                        elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
+                                        colors = CardDefaults.cardColors(containerColor = Color.White)
+                                    ) {
+                                        LazyColumn(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                                            contentPadding = PaddingValues(vertical = 16.dp)
+                                        ) {
+                                            items(
+                                                items = integrantes,
+                                                { player -> player.id }
+                                            ) { integrante ->
+                                                val isSelected = integrante.id == selectedPlayerId
 
-                                        Box(modifier = Modifier.clickable {
-                                            selectedPlayerId = integrante.id
-                                        }) {
-                                            UserRow(
-                                                name = integrante.name,
-                                                isSelected = isSelected
-                                            )
+                                                Box(modifier = Modifier.clickable(enabled = !hasVoted) { // Si ya votó, no puede cambiar selección
+                                                    selectedPlayerId = integrante.id
+                                                }) {
+                                                    UserRow(
+                                                        name = "${integrante.name} (${integrante.votes} votos)",
+                                                        isSelected = isSelected
+                                                    )
+                                                }
+                                            }
                                         }
+                                    }
+                                    Column(
+                                        modifier = Modifier.fillMaxSize(),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Spacer(modifier = Modifier.height(13.dp))
+
+                                        PuraCaspaButton(
+                                            text = "VOTAR",
+                                            onClick = {
+                                                viewModel.onVoteClicked(nameTable, selectedPlayerId)
+                                            },
+                                            enabled = !hasVoted && selectedPlayerId.isNotEmpty(),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(64.dp)
+                                        )
                                     }
                                 }
 
-                                Spacer(modifier = Modifier.height(13.dp))
-
-                                PuraCaspaButton(
-                                    text = "VOTAR",
-                                    onClick = {
-                                        isVoteButtonEnabled = false
-                                        viewModel.changeStatusToVoting(nameTable)
-                                    },
-                                    enabled = isVoteButtonEnabled && selectedPlayerId.isNotEmpty(),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(64.dp)
-                                )
+                            } else {
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = RoundedCornerShape(32.dp),
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
+                                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .padding(vertical = 48.dp, horizontal = 16.dp)
+                                            .fillMaxWidth(),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Center
+                                    ) {
+                                        val imposter =
+                                            integrantes.find { it.id == partyData?.amoung_us }
+                                        val imposterNameDisplay = imposter?.name ?: ""
+                                        Text(
+                                            text = imposterNameDisplay,
+                                            color = Color.Red,
+                                            fontSize = 48.sp,
+                                            fontWeight = FontWeight.Black,
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                }
                             }
 
                         } else {
@@ -240,22 +287,6 @@ fun PuraCaspaGameView(
                         }
                     }
                     Spacer(modifier = Modifier.weight(0.2f))
-                    if (partyData!!.stateParty == "voting") {
-                        AnimatedVisibility(visible = isVisibleVoting) {
-                            Column {
-                                PuraCaspaButton(
-                                    text = "VOTAR",
-                                    onClick = {
-                                        viewModel.changeStatusToVoting(nameTable)
-                                    },
-                                    enabled = isVisibleVoting,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(64.dp)
-                                )
-                            }
-                        }
-                    }
                     if (isHost) {
                         if (partyData?.stateParty == "waiting") {
                             AnimatedVisibility(visible = isVisible) {
@@ -280,9 +311,30 @@ fun PuraCaspaGameView(
                                         text = "INICIAR VOTACION",
                                         onClick = {
                                             viewModel.changeStatusToVoting(nameTable)
-                                            isVisibleVoting = false
+                                            //isVisibleVoting = false
+                                            isVotingOver = true
                                         },
                                         enabled = isVisibleVoting,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(64.dp)
+                                    )
+                                }
+                            }
+                        }
+
+                        if (partyData!!.stateParty == "voting") {
+                            AnimatedVisibility(visible = isVotingOver) {
+                                Column {
+                                    PuraCaspaButton(
+                                        text = "Mostrar Impostor",
+                                        onClick = {
+                                            viewModel.onRevealImpostorClicked(nameTable)
+                                            isVotingOver = false
+                                            isVisibleVoting = true
+                                            revealImpostor = true
+                                        },
+                                        enabled = isVotingOver,
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .height(64.dp)
@@ -301,6 +353,7 @@ fun PuraCaspaGameView(
                             ),
                             onClick = {
                                 viewModel.onStartGameClicked(nameTable)
+                                revealImpostor = false
                                 isVisible = false
                                 isVisibleVoting = true
                             },

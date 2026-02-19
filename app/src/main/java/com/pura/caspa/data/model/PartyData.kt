@@ -7,5 +7,6 @@ data class PartyData(
     val integrantes: List<Player> = emptyList(),
     val palabra_actual: String = "",
     val amoung_us : String = "",
-    val usedWords: List<String> = emptyList()
+    val usedWords: List<String> = emptyList(),
+    val showImpostor: Boolean = false
 )

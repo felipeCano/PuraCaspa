@@ -9,9 +9,11 @@ import com.pura.caspa.data.util.UiText
 import com.pura.caspa.domain.usecase.GetInstallationIdUseCase
 import com.pura.caspa.domain.usecase.GetPartyDataUseCase
 import com.pura.caspa.domain.usecase.GetUserNameUseCase
+import com.pura.caspa.domain.usecase.RevealImpostorUseCase
 import com.pura.caspa.domain.usecase.SharePartyIDUseCase
 import com.pura.caspa.domain.usecase.StartGameUseCase
 import com.pura.caspa.domain.usecase.UpdateToVotingUseCase
+import com.pura.caspa.domain.usecase.VoteForPlayerUseCase
 import com.pura.caspa.presentation.util.toUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +29,9 @@ class PuraCaspaGameViewModel @Inject constructor(
     private val getInstallationIdUseCase: GetInstallationIdUseCase,
     private val startGameUseCase: StartGameUseCase,
     private val sharePartyIDUseCase: SharePartyIDUseCase,
-    private val updateToVotingUseCase: UpdateToVotingUseCase
+    private val updateToVotingUseCase: UpdateToVotingUseCase,
+    private val voteForPlayerUseCase: VoteForPlayerUseCase,
+    private val revealImpostorUseCase: RevealImpostorUseCase
 ) : ViewModel() {
 
     private val _partyData = MutableStateFlow<Resource<PartyData>>(Resource.Loading())
@@ -40,6 +44,9 @@ class PuraCaspaGameViewModel @Inject constructor(
 
     private val _shareMessage = MutableStateFlow("")
     val shareMessage = _shareMessage.asStateFlow()
+
+    private val _hasVoted = MutableStateFlow(false)
+    val hasVoted: StateFlow<Boolean> = _hasVoted.asStateFlow()
 
     init {
         loadMyInstallationId()
@@ -75,6 +82,9 @@ class PuraCaspaGameViewModel @Inject constructor(
             val roomData = currentRoomState.data
 
             viewModelScope.launch {
+                revealImpostorUseCase(roomId, false)
+                resetVotingState()
+
                 //3. We call the UseCase passing the required parameters
                 val result = startGameUseCase(
                     roomId = roomId,
@@ -125,6 +135,33 @@ class PuraCaspaGameViewModel @Inject constructor(
                 is Resource.Loading -> { }
                 is Resource.Idle -> {}
             }
+        }
+    }
+
+    //Voting
+    fun onVoteClicked(roomId: String, playerVotedId: String) {
+        if (_hasVoted.value) return
+
+        viewModelScope.launch {
+            _hasVoted.value = true
+
+            val result = voteForPlayerUseCase(roomId, playerVotedId)
+
+            if (result is Resource.Error) {
+                _hasVoted.value = false
+            }
+        }
+    }
+
+    //Fun to reset voting state when a new round starts
+    fun resetVotingState() {
+        _hasVoted.value = false
+    }
+
+    //Reveal Imposter
+    fun onRevealImpostorClicked(roomId: String) {
+        viewModelScope.launch {
+            revealImpostorUseCase(roomId, true) // Activamos el switch global
         }
     }
 }

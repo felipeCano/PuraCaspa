@@ -34,4 +34,10 @@ interface PuraCaspaRepository {
 
     //UpdatePartyState
     suspend fun updateToVotingStatus(roomId: String): Resource<Unit>
+
+    //Voting
+    suspend fun voteForPlayer(roomId: String, playerVotedId: String): Resource<Unit>
+
+    //Reveal Imposter
+    suspend fun revealImpostor(roomId: String, reveal: Boolean): Resource<Unit>
 }

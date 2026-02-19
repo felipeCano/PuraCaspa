@@ -164,4 +164,48 @@ class PuraCaspaRemoteDataSourceImpl(
         }
     }
 
+    //Voting
+    override suspend fun voteForPlayer(roomId: String, playerVotedId: String): Resource<Unit> {
+        return try {
+            val roomRef = db.collection("salas").document(roomId)
+
+            db.runTransaction { transaction ->
+                val snapshot = transaction.get(roomRef)
+                val partyData = snapshot.toObject(PartyData::class.java)
+                val integrantes = partyData?.integrantes?.toMutableList() ?: mutableListOf()
+
+                val playerToUpdate = integrantes.find { it.id == playerVotedId }
+
+                if (playerToUpdate != null) {
+                    val index = integrantes.indexOf(playerToUpdate)
+                    integrantes[index] = playerToUpdate.copy(votes = playerToUpdate.votes + 1)
+
+                    transaction.update(roomRef, "integrantes", integrantes)
+                }
+            }.await()
+
+            Resource.Success(Unit)
+        } catch (e: Exception) {
+            val errorEnum = if (e.localizedMessage == null) PartyError.FIREBASE_ERROR else null
+            val dynamicMsg = e.localizedMessage?.let { UiText.DynamicString(it) }
+            Resource.Error(errorEnum,dynamicMsg)
+            //Resource.Error(e.message ?: "Error al registrar el voto")
+        }
+    }
+
+    //Reveal Imposter
+    override suspend fun revealImpostor(roomId: String, reveal: Boolean): Resource<Unit> {
+        return try {
+            db.collection("salas").document(roomId)
+                .update("showImpostor", reveal)
+                .await()
+            Resource.Success(Unit)
+        } catch (e: Exception) {
+            val errorEnum = if (e.localizedMessage == null) PartyError.FIREBASE_ERROR else null
+            val dynamicMsg = e.localizedMessage?.let { UiText.DynamicString(it) }
+            Resource.Error(errorEnum,dynamicMsg)
+            //Resource.Error(e.message ?: "Error al revelar impostor")
+        }
+    }
+
 }

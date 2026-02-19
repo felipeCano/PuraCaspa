@@ -7,10 +7,12 @@ import com.pura.caspa.domain.usecase.GetPartyDataUseCase
 import com.pura.caspa.domain.usecase.GetUserNameUseCase
 import com.pura.caspa.domain.usecase.GetWordsToPlayUseCase
 import com.pura.caspa.domain.usecase.JoinPartyUseCase
+import com.pura.caspa.domain.usecase.RevealImpostorUseCase
 import com.pura.caspa.domain.usecase.SaveUserNameUseCase
 import com.pura.caspa.domain.usecase.SharePartyIDUseCase
 import com.pura.caspa.domain.usecase.StartGameUseCase
 import com.pura.caspa.domain.usecase.UpdateToVotingUseCase
+import com.pura.caspa.domain.usecase.VoteForPlayerUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -99,5 +101,21 @@ class UseCaseModule {
         puraCaspaRepository: PuraCaspaRepository
     ): UpdateToVotingUseCase {
         return UpdateToVotingUseCase(puraCaspaRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideVoteForPlayerUseCase(
+        puraCaspaRepository: PuraCaspaRepository
+    ): VoteForPlayerUseCase {
+        return VoteForPlayerUseCase(puraCaspaRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideRevealImposterUseCase(
+        puraCaspaRepository: PuraCaspaRepository
+    ): RevealImpostorUseCase {
+        return RevealImpostorUseCase(puraCaspaRepository)
     }
 }
