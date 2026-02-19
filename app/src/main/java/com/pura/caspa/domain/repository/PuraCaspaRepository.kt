@@ -29,5 +29,9 @@ interface PuraCaspaRepository {
         newUsedWordsList: List<String>
     ): Resource<Unit>
 
+    //InstallationId from Firebase
     suspend fun getInstallationId(): String
+
+    //UpdatePartyState
+    suspend fun updateToVotingStatus(roomId: String): Resource<Unit>
 }

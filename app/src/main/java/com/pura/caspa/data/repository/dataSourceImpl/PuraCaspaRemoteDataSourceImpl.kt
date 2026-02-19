@@ -149,4 +149,19 @@ class PuraCaspaRemoteDataSourceImpl(
         }
     }
 
+    //Updated PartyState
+    override suspend fun updateToVotingStatus(roomId: String): Resource<Unit> {
+        return try {
+            db.collection("salas").document(roomId)
+                .update("stateParty", "voting") // Actualizamos el estado a votando
+                .await()
+            Resource.Success(Unit)
+        } catch (e: Exception) {
+            //Resource.Error(e.message ?: "Error al cambiar a votación")
+            val errorEnum = if (e.localizedMessage == null) PartyError.FIREBASE_ERROR else null
+            val dynamicMsg = e.localizedMessage?.let { UiText.DynamicString(it) }
+            Resource.Error(errorEnum,dynamicMsg)
+        }
+    }
+
 }

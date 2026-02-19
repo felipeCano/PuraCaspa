@@ -25,4 +25,7 @@ interface PuraCaspaRemoteDataSource {
         status: String,
         newUsedWordsList: List<String>
     ): Resource<Unit>
+
+    //Update PartyState
+    suspend fun updateToVotingStatus(roomId: String): Resource<Unit>
 }

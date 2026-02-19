@@ -77,4 +77,9 @@ class PuraCaspaRepositoryImpl(
     override suspend fun getInstallationId(): String {
         return installationIdProvider.getInstallationId()
     }
+
+    //Updated PartyState
+    override suspend fun updateToVotingStatus(roomId: String): Resource<Unit> {
+        return puraCaspaRemoteDataSource.updateToVotingStatus(roomId)
+    }
 }

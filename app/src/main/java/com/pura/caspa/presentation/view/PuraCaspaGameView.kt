@@ -1,15 +1,18 @@
 package com.pura.caspa.presentation.view
 
 import android.content.Intent
-import android.opengl.Visibility
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -27,21 +30,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.pura.caspa.R
 import com.pura.caspa.compose.PuraCaspaButton
 import com.pura.caspa.compose.TitleFrame
+import com.pura.caspa.compose.UserRow
 import com.pura.caspa.data.util.Resource
 import com.pura.caspa.presentation.viewmodel.PuraCaspaGameViewModel
-import dagger.hilt.android.AndroidEntryPoint
+import androidx.compose.foundation.lazy.items
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,8 +55,11 @@ fun PuraCaspaGameView(
     val roomState by viewModel.partyData.collectAsState()
     val myId by viewModel.myId.collectAsState()
     var isVisible by remember { mutableStateOf(true) }
+    var isVisibleVoting by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val messageToShare by viewModel.shareMessage.collectAsState()
+    var selectedPlayerId by remember { mutableStateOf("") }
+    var isVoteButtonEnabled by remember { mutableStateOf(true) }
 
     LaunchedEffect(key1 = nameTable) {
         viewModel.listenToRoom(nameTable)
@@ -70,6 +75,16 @@ fun PuraCaspaGameView(
             val shareIntent = Intent.createChooser(sendIntent, null)
             context.startActivity(shareIntent)
             viewModel.onShareDone()
+        }
+    }
+
+    LaunchedEffect(roomState) {
+        if (roomState is Resource.Success) {
+            val partyData = roomState.data
+            if (partyData?.stateParty == "voting") {
+                selectedPlayerId = ""
+                isVoteButtonEnabled = true
+            }
         }
     }
 
@@ -150,6 +165,48 @@ fun PuraCaspaGameView(
                                     }
                                 }
                             }
+                        } else if (partyData?.stateParty == "voting") {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                LazyColumn(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                                    contentPadding = PaddingValues(vertical = 16.dp)
+                                ) {
+                                    items(
+                                        items = integrantes,
+                                        { player -> player.id }) { integrante ->
+                                        val isSelected = integrante.id == selectedPlayerId
+
+                                        Box(modifier = Modifier.clickable {
+                                            selectedPlayerId = integrante.id
+                                        }) {
+                                            UserRow(
+                                                name = integrante.name,
+                                                isSelected = isSelected
+                                            )
+                                        }
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(13.dp))
+
+                                PuraCaspaButton(
+                                    text = "VOTAR",
+                                    onClick = {
+                                        isVoteButtonEnabled = false
+                                        viewModel.changeStatusToVoting(nameTable)
+                                    },
+                                    enabled = isVoteButtonEnabled && selectedPlayerId.isNotEmpty(),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(64.dp)
+                                )
+                            }
+
                         } else {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
@@ -183,23 +240,58 @@ fun PuraCaspaGameView(
                         }
                     }
                     Spacer(modifier = Modifier.weight(0.2f))
+                    if (partyData!!.stateParty == "voting") {
+                        AnimatedVisibility(visible = isVisibleVoting) {
+                            Column {
+                                PuraCaspaButton(
+                                    text = "VOTAR",
+                                    onClick = {
+                                        viewModel.changeStatusToVoting(nameTable)
+                                    },
+                                    enabled = isVisibleVoting,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(64.dp)
+                                )
+                            }
+                        }
+                    }
                     if (isHost) {
-                        PuraCaspaButton(
-                            text = stringResource(R.string.share_room),
-                            onClick = {
-                                viewModel.onShareClicked(nameTable)
-                            },
-                            enabled = isVisible,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(64.dp)
-                                .graphicsLayer {
-                                    alpha = if (isVisible) 1f else 0f
-                                },
-                        )
+                        if (partyData?.stateParty == "waiting") {
+                            AnimatedVisibility(visible = isVisible) {
+                                Column {
+                                }
+                                PuraCaspaButton(
+                                    text = stringResource(R.string.share_room),
+                                    onClick = {
+                                        viewModel.onShareClicked(nameTable)
+                                    },
+                                    enabled = isVisible,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(64.dp)
+                                )
+                            }
+                        }
+                        if (partyData!!.stateParty == "jugando") {
+                            AnimatedVisibility(visible = isVisibleVoting) {
+                                Column {
+                                    PuraCaspaButton(
+                                        text = "INICIAR VOTACION",
+                                        onClick = {
+                                            viewModel.changeStatusToVoting(nameTable)
+                                            isVisibleVoting = false
+                                        },
+                                        enabled = isVisibleVoting,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(64.dp)
+                                    )
+                                }
+                            }
+                        }
 
                         Spacer(modifier = Modifier.height(16.dp))
-
 
                         PuraCaspaButton(
                             text = if (partyData.stateParty == "waiting") stringResource(
@@ -210,6 +302,7 @@ fun PuraCaspaGameView(
                             onClick = {
                                 viewModel.onStartGameClicked(nameTable)
                                 isVisible = false
+                                isVisibleVoting = true
                             },
                             enabled = integrantes.size >= 2,
                             modifier = Modifier

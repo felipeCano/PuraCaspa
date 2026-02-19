@@ -11,6 +11,7 @@ import com.pura.caspa.domain.usecase.GetPartyDataUseCase
 import com.pura.caspa.domain.usecase.GetUserNameUseCase
 import com.pura.caspa.domain.usecase.SharePartyIDUseCase
 import com.pura.caspa.domain.usecase.StartGameUseCase
+import com.pura.caspa.domain.usecase.UpdateToVotingUseCase
 import com.pura.caspa.presentation.util.toUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +26,8 @@ class PuraCaspaGameViewModel @Inject constructor(
     private val getPartyDataUseCase: GetPartyDataUseCase,
     private val getInstallationIdUseCase: GetInstallationIdUseCase,
     private val startGameUseCase: StartGameUseCase,
-    private val sharePartyIDUseCase: SharePartyIDUseCase
+    private val sharePartyIDUseCase: SharePartyIDUseCase,
+    private val updateToVotingUseCase: UpdateToVotingUseCase
 ) : ViewModel() {
 
     private val _partyData = MutableStateFlow<Resource<PartyData>>(Resource.Loading())
@@ -104,5 +106,25 @@ class PuraCaspaGameViewModel @Inject constructor(
 
     fun onShareDone() {
         _shareMessage.value = ""
+    }
+
+    //updated PartyState
+    fun changeStatusToVoting(roomId: String) {
+        viewModelScope.launch {
+            val result = updateToVotingUseCase(roomId)
+
+            when (result) {
+                is Resource.Error -> {
+                    val finalMessage = result.partyError?.toUiText(args = roomId)
+                        ?: result.message
+                        ?: UiText.StringResource(R.string.unknown_error)
+
+                    _partyData.value = Resource.Error(message = finalMessage)
+                }
+                is Resource.Success -> {}
+                is Resource.Loading -> { }
+                is Resource.Idle -> {}
+            }
+        }
     }
 }

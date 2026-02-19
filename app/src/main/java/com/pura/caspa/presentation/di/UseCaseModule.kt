@@ -10,6 +10,7 @@ import com.pura.caspa.domain.usecase.JoinPartyUseCase
 import com.pura.caspa.domain.usecase.SaveUserNameUseCase
 import com.pura.caspa.domain.usecase.SharePartyIDUseCase
 import com.pura.caspa.domain.usecase.StartGameUseCase
+import com.pura.caspa.domain.usecase.UpdateToVotingUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -90,5 +91,13 @@ class UseCaseModule {
         puraCaspaRepository: PuraCaspaRepository
     ): SharePartyIDUseCase {
         return SharePartyIDUseCase(puraCaspaRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideUpdateToVotingUseCase(
+        puraCaspaRepository: PuraCaspaRepository
+    ): UpdateToVotingUseCase {
+        return UpdateToVotingUseCase(puraCaspaRepository)
     }
 }
