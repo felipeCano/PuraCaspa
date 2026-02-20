@@ -60,6 +60,7 @@ fun PuraCaspaGameView(
     val stateParty = (roomState as? Resource.Success)?.data?.stateParty
     val isVotingComplete by viewModel.isVotingComplete.collectAsState()
     val votingProgress by viewModel.votingProgress.collectAsState()
+    val isChangingWord by viewModel.isChangingWord.collectAsState()
 
     LaunchedEffect(key1 = nameTable) {
         viewModel.listenToRoom(nameTable)
@@ -98,131 +99,25 @@ fun PuraCaspaGameView(
                 .padding(horizontal = 20.dp, vertical = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            when (val state = roomState) {
-                is Resource.Success -> {
-                    val partyData = state.data
-                    val integrantes = partyData?.integrantes ?: emptyList()
-                    val isHost = partyData?.host_id == myId
-                    var revealImpostor = partyData?.showImpostor ?: false
+            if (isChangingWord) {
+                CircularProgressIndicator()
+            } else {
+                when (val state = roomState) {
+                    is Resource.Success -> {
+                        val partyData = state.data
+                        val integrantes = partyData?.integrantes ?: emptyList()
+                        val isHost = partyData?.host_id == myId
+                        var revealImpostor = partyData?.showImpostor ?: false
 
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (partyData?.stateParty == "jugando") {
-                            val isImpostor = partyData.amoung_us == myId
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (partyData?.stateParty == "jugando") {
+                                val isImpostor = partyData.amoung_us == myId
 
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(32.dp),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
-                                colors = CardDefaults.cardColors(containerColor = Color.White)
-                            ) {
-                                Column(
-                                    modifier = Modifier
-                                        .padding(vertical = 48.dp, horizontal = 16.dp)
-                                        .fillMaxWidth(),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center
-                                ) {
-                                    if (isImpostor) {
-                                        Text(
-                                            text = stringResource(R.string.you_are_the),
-                                            color = Color.Red,
-                                            fontSize = 24.sp,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                        Text(
-                                            text = stringResource(R.string.imposter),
-                                            color = Color.Red,
-                                            fontSize = 48.sp,
-                                            fontWeight = FontWeight.Black,
-                                            textAlign = TextAlign.Center
-                                        )
-                                        Spacer(modifier = Modifier.height(16.dp))
-                                        Text(
-                                            text = stringResource(R.string.lie_to_survive),
-                                            style = MaterialTheme.typography.bodyLarge,
-                                            color = Color.Gray
-                                        )
-                                    } else {
-                                        Text(
-                                            text = stringResource(R.string.your_word_is),
-                                            fontSize = 18.sp,
-                                            color = Color.Gray,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                        Spacer(modifier = Modifier.height(12.dp))
-                                        Text(
-                                            text = partyData.palabra_actual,
-                                            fontSize = 55.sp,
-                                            fontWeight = FontWeight.ExtraBold,
-                                            color = Color(0xFF2E7D32),
-                                            textAlign = TextAlign.Center,
-                                            lineHeight = 60.sp,
-                                            softWrap = true,
-                                            maxLines = 2
-                                        )
-                                    }
-                                }
-                            }
-                        } else if (partyData?.stateParty == "voting") {
-                            if (!revealImpostor) {
-                                Column(
-                                    modifier = Modifier.fillMaxSize(),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Card(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        shape = RoundedCornerShape(32.dp),
-                                        elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
-                                        colors = CardDefaults.cardColors(containerColor = Color.White)
-                                    ) {
-                                        LazyColumn(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalAlignment = Alignment.CenterHorizontally,
-                                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                                            contentPadding = PaddingValues(vertical = 16.dp)
-                                        ) {
-                                            items(
-                                                items = integrantes,
-                                                { player -> player.id }
-                                            ) { integrante ->
-                                                val isSelected = integrante.id == selectedPlayerId
-
-                                                Box(modifier = Modifier.clickable(enabled = !hasVoted) { // Si ya votó, no puede cambiar selección
-                                                    selectedPlayerId = integrante.id
-                                                }) {
-                                                    UserRow(
-                                                        name = "${integrante.name} (${integrante.votes} votos)",
-                                                        isSelected = isSelected
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
-                                    Column(
-                                        modifier = Modifier.fillMaxSize(),
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        Spacer(modifier = Modifier.height(13.dp))
-
-                                        PuraCaspaButton(
-                                            text = "VOTAR",
-                                            onClick = {
-                                                viewModel.onVoteClicked(nameTable, selectedPlayerId)
-                                            },
-                                            enabled = !hasVoted && selectedPlayerId.isNotEmpty(),
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(64.dp)
-                                        )
-                                    }
-                                }
-
-                            } else {
                                 Card(
                                     modifier = Modifier.fillMaxWidth(),
                                     shape = RoundedCornerShape(32.dp),
@@ -236,74 +131,174 @@ fun PuraCaspaGameView(
                                         horizontalAlignment = Alignment.CenterHorizontally,
                                         verticalArrangement = Arrangement.Center
                                     ) {
-                                        val imposter =
-                                            integrantes.find { it.id == partyData?.amoung_us }
-                                        val imposterNameDisplay = imposter?.name ?: ""
-                                        Text(
-                                            text = imposterNameDisplay,
-                                            color = Color.Red,
-                                            fontSize = 48.sp,
-                                            fontWeight = FontWeight.Black,
-                                            textAlign = TextAlign.Center
-                                        )
+                                        if (isImpostor) {
+                                            Text(
+                                                text = stringResource(R.string.you_are_the),
+                                                color = Color.Red,
+                                                fontSize = 24.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                            Text(
+                                                text = stringResource(R.string.imposter),
+                                                color = Color.Red,
+                                                fontSize = 48.sp,
+                                                fontWeight = FontWeight.Black,
+                                                textAlign = TextAlign.Center
+                                            )
+                                            Spacer(modifier = Modifier.height(16.dp))
+                                            Text(
+                                                text = stringResource(R.string.lie_to_survive),
+                                                style = MaterialTheme.typography.bodyLarge,
+                                                color = Color.Gray
+                                            )
+                                        } else {
+                                            Text(
+                                                text = stringResource(R.string.your_word_is),
+                                                fontSize = 18.sp,
+                                                color = Color.Gray,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                            Spacer(modifier = Modifier.height(12.dp))
+                                            Text(
+                                                text = partyData.palabra_actual,
+                                                fontSize = 55.sp,
+                                                fontWeight = FontWeight.ExtraBold,
+                                                color = Color(0xFF2E7D32),
+                                                textAlign = TextAlign.Center,
+                                                lineHeight = 60.sp,
+                                                softWrap = true,
+                                                maxLines = 2
+                                            )
+                                        }
                                     }
                                 }
-                            }
+                            } else if (partyData?.stateParty == "voting") {
+                                if (!revealImpostor) {
+                                    Column(
+                                        modifier = Modifier.fillMaxSize(),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Card(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            shape = RoundedCornerShape(32.dp),
+                                            elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
+                                            colors = CardDefaults.cardColors(containerColor = Color.White)
+                                        ) {
+                                            LazyColumn(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                verticalArrangement = Arrangement.spacedBy(12.dp),
+                                                contentPadding = PaddingValues(vertical = 16.dp)
+                                            ) {
+                                                items(
+                                                    items = integrantes,
+                                                    { player -> player.id }
+                                                ) { integrante ->
+                                                    val isSelected =
+                                                        integrante.id == selectedPlayerId
 
-                        } else {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    stringResource(R.string.waiting_to_start),
-                                    style = MaterialTheme.typography.headlineSmall,
-                                    modifier = Modifier.padding(bottom = 20.dp)
-                                )
-                                Card(
-                                    modifier = Modifier.fillMaxWidth(0.9f),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                                    )
-                                ) {
-                                    Column(modifier = Modifier.padding(24.dp)) {
-                                        Text(
-                                            stringResource(
-                                                R.string.players_waiting
-                                            ) + " (${integrantes.size}):",
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        integrantes.forEach {
-                                            Text(
-                                                "• ${it.name}",
-                                                style = MaterialTheme.typography.bodyLarge
+                                                    Box(modifier = Modifier.clickable(enabled = !hasVoted) { // Si ya votó, no puede cambiar selección
+                                                        selectedPlayerId = integrante.id
+                                                    }) {
+                                                        UserRow(
+                                                            name = "${integrante.name} (${integrante.votes} votos)",
+                                                            isSelected = isSelected
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        Column(
+                                            modifier = Modifier.fillMaxSize(),
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            Spacer(modifier = Modifier.height(13.dp))
+
+                                            PuraCaspaButton(
+                                                text = "VOTAR",
+                                                onClick = {
+                                                    viewModel.onVoteClicked(
+                                                        nameTable,
+                                                        selectedPlayerId
+                                                    )
+                                                },
+                                                enabled = !hasVoted && selectedPlayerId.isNotEmpty(),
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(64.dp)
                                             )
+                                        }
+                                    }
+
+                                } else {
+                                    Card(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        shape = RoundedCornerShape(32.dp),
+                                        elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
+                                        colors = CardDefaults.cardColors(containerColor = Color.White)
+                                    ) {
+                                        Column(
+                                            modifier = Modifier
+                                                .padding(vertical = 48.dp, horizontal = 16.dp)
+                                                .fillMaxWidth(),
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                            verticalArrangement = Arrangement.Center
+                                        ) {
+                                            val imposter =
+                                                integrantes.find { it.id == partyData?.amoung_us }
+                                            val imposterNameDisplay = imposter?.name ?: ""
+                                            Text(
+                                                text = imposterNameDisplay,
+                                                color = Color.Red,
+                                                fontSize = 48.sp,
+                                                fontWeight = FontWeight.Black,
+                                                textAlign = TextAlign.Center
+                                            )
+                                        }
+                                    }
+                                }
+
+                            } else {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(
+                                        stringResource(R.string.waiting_to_start),
+                                        style = MaterialTheme.typography.headlineSmall,
+                                        modifier = Modifier.padding(bottom = 20.dp)
+                                    )
+                                    Card(
+                                        modifier = Modifier.fillMaxWidth(0.9f),
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                        )
+                                    ) {
+                                        Column(modifier = Modifier.padding(24.dp)) {
+                                            Text(
+                                                stringResource(
+                                                    R.string.players_waiting
+                                                ) + " (${integrantes.size}):",
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            integrantes.forEach {
+                                                Text(
+                                                    "• ${it.name}",
+                                                    style = MaterialTheme.typography.bodyLarge
+                                                )
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
-                    Spacer(modifier = Modifier.weight(0.2f))
-                    if (isHost) {
-                        if (partyData?.stateParty == "waiting") {
-                            Column {
-                            }
-                            PuraCaspaButton(
-                                text = stringResource(R.string.share_room),
-                                onClick = {
-                                    viewModel.onShareClicked(nameTable)
-                                },
-                                enabled = true,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(64.dp)
-                            )
-                        }
-                        if (partyData!!.stateParty == "jugando") {
-                            Column {
+                        Spacer(modifier = Modifier.weight(0.2f))
+                        if (isHost) {
+                            if (partyData?.stateParty == "waiting") {
+                                Column {
+                                }
                                 PuraCaspaButton(
-                                    text = "INICIAR VOTACION",
+                                    text = stringResource(R.string.share_room),
                                     onClick = {
-                                        viewModel.changeStatusToVoting(nameTable)
+                                        viewModel.onShareClicked(nameTable)
                                     },
                                     enabled = true,
                                     modifier = Modifier
@@ -311,82 +306,98 @@ fun PuraCaspaGameView(
                                         .height(64.dp)
                                 )
                             }
-                        }
-                        if (partyData?.stateParty == "voting" && !revealImpostor) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                PuraCaspaButton(
-                                    text = "MOSTRAR IMPOSTOR",
-                                    onClick = { viewModel.onRevealImpostorClicked(nameTable) },
-                                    enabled = isVotingComplete,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(64.dp)
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = if (isVotingComplete) "¡Votación terminada!" else "Votos recibidos: $votingProgress",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = if (isVotingComplete) Color(0xFF2E7D32) else Color.Gray
-                                )
+                            if (partyData!!.stateParty == "jugando") {
+                                Column {
+                                    PuraCaspaButton(
+                                        text = "INICIAR VOTACION",
+                                        onClick = {
+                                            viewModel.changeStatusToVoting(nameTable)
+                                        },
+                                        enabled = true,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(64.dp)
+                                    )
+                                }
                             }
+                            if (partyData?.stateParty == "voting" && !revealImpostor) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    PuraCaspaButton(
+                                        text = "MOSTRAR IMPOSTOR",
+                                        onClick = { viewModel.onRevealImpostorClicked(nameTable) },
+                                        enabled = isVotingComplete,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(64.dp)
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(
+                                        text = if (isVotingComplete) "¡Votación terminada!" else "Votos recibidos: $votingProgress",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = if (isVotingComplete) Color(0xFF2E7D32) else Color.Gray
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            PuraCaspaButton(
+                                text = if (partyData.stateParty == "waiting") stringResource(
+                                    R.string.start_game
+                                ) else stringResource(
+                                    R.string.next_word
+                                ),
+                                onClick = {
+                                    viewModel.onStartGameClicked(nameTable)
+                                },
+                                enabled = integrantes.size >= 2 && (
+                                        partyData.stateParty == "waiting" || // Permitir si apenas van a empezar
+                                                (partyData.stateParty == "voting" && isVotingComplete)),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(64.dp),
+                            )
                         }
+                    }
 
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        PuraCaspaButton(
-                            text = if (partyData.stateParty == "waiting") stringResource(
-                                R.string.start_game
-                            ) else stringResource(
-                                R.string.next_word
-                            ),
-                            onClick = {
-                                viewModel.onStartGameClicked(nameTable)
-                            },
-                            enabled = integrantes.size >= 2 && (partyData.stateParty != "voting" || isVotingComplete),
+                    is Resource.Loading -> CircularProgressIndicator()
+                    is Resource.Error -> {
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(64.dp),
-                        )
-                    }
-                }
-
-                is Resource.Loading -> CircularProgressIndicator()
-                is Resource.Error -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(32.dp),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color.White)
+                                .weight(1f),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Column(
-                                modifier = Modifier
-                                    .padding(vertical = 48.dp, horizontal = 16.dp)
-                                    .fillMaxWidth(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(32.dp),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
+                                colors = CardDefaults.cardColors(containerColor = Color.White)
                             ) {
-                                val errorText = state.message?.asString(context) ?: ""
-                                Text(
-                                    text = errorText.ifEmpty { "Error Desconocido" },
-                                    color = Color.Red,
-                                    fontSize = 28.sp,
-                                    lineHeight = 34.sp,
-                                    textAlign = TextAlign.Center,
-                                    fontWeight = FontWeight.Black
-                                )
+                                Column(
+                                    modifier = Modifier
+                                        .padding(vertical = 48.dp, horizontal = 16.dp)
+                                        .fillMaxWidth(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    val errorText = state.message?.asString(context) ?: ""
+                                    Text(
+                                        text = errorText.ifEmpty { "Error Desconocido" },
+                                        color = Color.Red,
+                                        fontSize = 28.sp,
+                                        lineHeight = 34.sp,
+                                        textAlign = TextAlign.Center,
+                                        fontWeight = FontWeight.Black
+                                    )
+                                }
                             }
                         }
+                        Spacer(modifier = Modifier.weight(0.2f))
                     }
-                    Spacer(modifier = Modifier.weight(0.2f))
-                }
 
-                is Resource.Idle -> {}
+                    is Resource.Idle -> {}
+                }
             }
         }
     }

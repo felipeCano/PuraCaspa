@@ -39,6 +39,8 @@ class PuraCaspaGameViewModel @Inject constructor(
     private val resetPlayersVotesUseCase: ResetPlayersVotesUseCase
 ) : ViewModel() {
 
+    private var lastWord = ""
+
     private val _partyData = MutableStateFlow<Resource<PartyData>>(Resource.Loading())
     val partyData = _partyData.asStateFlow()
 
@@ -52,6 +54,9 @@ class PuraCaspaGameViewModel @Inject constructor(
 
     private val _hasVoted = MutableStateFlow(false)
     val hasVoted: StateFlow<Boolean> = _hasVoted.asStateFlow()
+
+    private val _isChangingWord = MutableStateFlow(false)
+    val isChangingWord = _isChangingWord.asStateFlow()
 
     init {
         loadMyInstallationId()
@@ -74,6 +79,9 @@ class PuraCaspaGameViewModel @Inject constructor(
         viewModelScope.launch {
             getPartyDataUseCase(roomId).collect { result ->
                 _partyData.value = result
+                if (result is Resource.Success && result.data?.palabra_actual != lastWord) {
+                    _isChangingWord.value = false
+                }
             }
         }
     }
@@ -85,10 +93,11 @@ class PuraCaspaGameViewModel @Inject constructor(
         //2. Just proceed if the state is Success (we have room data)
         if (currentRoomState is Resource.Success) {
             val roomData = currentRoomState.data
-
+            lastWord = currentRoomState.data?.palabra_actual ?: ""
             viewModelScope.launch {
-                revealImpostorUseCase(roomId, false)
+                _isChangingWord.value = true
                 resetPlayersVotesUseCase(roomId)
+                revealImpostorUseCase(roomId, false)
                 resetVotingState()
 
                 //3. We call the UseCase passing the required parameters
