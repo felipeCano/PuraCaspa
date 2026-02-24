@@ -1,3 +1,13 @@
+import java.util.Properties
+import java.io.FileInputStream
+
+// Cargar las propiedades aquí arriba
+val secretProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) {
+        file.inputStream().use { load(it) } // .use cierra el stream automáticamente
+    }
+}
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -19,6 +29,11 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        val appId = secretProperties.getProperty("ADMOB_APP_ID") ?: ""
+        val adUnitId = secretProperties.getProperty("ADMOB_REWARDED_UNIT_ID") ?: ""
+
+        manifestPlaceholders["ADMOB_APP_ID"] = appId
+        buildConfigField("String", "ADMOB_REWARDED_UNIT_ID", "\"$adUnitId\"")
     }
 
     buildTypes {
@@ -37,8 +52,10 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -87,6 +104,8 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     //FirebaseInstallation
     implementation(libs.firebase.installations.ktx)
+    //
+    implementation(libs.play.services.ads)
 }
 
 kapt {

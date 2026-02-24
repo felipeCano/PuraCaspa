@@ -24,7 +24,14 @@ class StartGameUseCase(private val puraCaspaRepository: PuraCaspaRepository) {
         }
 
         if (availableWords.isEmpty()) {
-            return Resource.Error(PartyError.WITHOUT_WORDS)
+            val luckyImpostor = integrantes.random()
+            return puraCaspaRepository.updatePartyStart(
+                roomId = roomId,
+                word = "Sin palabras",
+                impostor = luckyImpostor.id,
+                status = "gameOver",
+                newUsedWordsList = usedWords + "sin palabras"
+            )
         }
 
         //3. Random

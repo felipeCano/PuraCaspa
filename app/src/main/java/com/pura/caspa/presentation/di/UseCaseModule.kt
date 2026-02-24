@@ -1,5 +1,6 @@
 package com.pura.caspa.presentation.di
 
+import com.pura.caspa.domain.repository.AdProvider
 import com.pura.caspa.domain.repository.PuraCaspaRepository
 import com.pura.caspa.domain.usecase.CreatePartyUseCase
 import com.pura.caspa.domain.usecase.GetInstallationIdUseCase
@@ -11,6 +12,7 @@ import com.pura.caspa.domain.usecase.ResetPlayersVotesUseCase
 import com.pura.caspa.domain.usecase.RevealImpostorUseCase
 import com.pura.caspa.domain.usecase.SaveUserNameUseCase
 import com.pura.caspa.domain.usecase.SharePartyIDUseCase
+import com.pura.caspa.domain.usecase.ShowRewardedAdUseCase
 import com.pura.caspa.domain.usecase.StartGameUseCase
 import com.pura.caspa.domain.usecase.UpdateToVotingUseCase
 import com.pura.caspa.domain.usecase.VoteForPlayerUseCase
@@ -126,5 +128,10 @@ class UseCaseModule {
         puraCaspaRepository: PuraCaspaRepository
     ): ResetPlayersVotesUseCase {
         return ResetPlayersVotesUseCase(puraCaspaRepository)
+    }
+
+    @Provides
+    fun provideShowRewardedAdUseCase(adProvider: AdProvider): ShowRewardedAdUseCase {
+        return ShowRewardedAdUseCase(adProvider)
     }
 }

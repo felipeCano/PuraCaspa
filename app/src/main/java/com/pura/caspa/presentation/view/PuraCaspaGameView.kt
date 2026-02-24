@@ -1,6 +1,7 @@
 package com.pura.caspa.presentation.view
 
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -61,6 +62,8 @@ fun PuraCaspaGameView(
     val isVotingComplete by viewModel.isVotingComplete.collectAsState()
     val votingProgress by viewModel.votingProgress.collectAsState()
     val isChangingWord by viewModel.isChangingWord.collectAsState()
+    var showResults by remember { mutableStateOf(false) }
+    var isAdLoading by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = nameTable) {
         viewModel.listenToRoom(nameTable)
@@ -91,6 +94,8 @@ fun PuraCaspaGameView(
             selectedPlayerId = ""
         }
     }
+
+
     TitleFrame(stringResource(R.string.party), nameTable) { paddingValues ->
         Column(
             modifier = modifier
@@ -256,6 +261,27 @@ fun PuraCaspaGameView(
                                             )
                                         }
                                     }
+                                }
+
+                            } else if (partyData?.stateParty == "gameOver") {
+                                if (!showResults) {
+                                    PuraCaspaButton(
+                                        text = if (isAdLoading) "CARGANDO VIDEO..." else "VER RESULTADOS (VIDEO)",
+                                        enabled = !isAdLoading,
+                                        onClick = {
+                                            isAdLoading = true
+                                            viewModel.onShowResultsClicked { earned ->
+                                                isAdLoading = false
+                                                if (earned) {
+                                                    showResults = true
+                                                } else {
+                                                    Toast.makeText(context, "El video no está listo, intenta en un momento", Toast.LENGTH_SHORT).show()
+                                                }
+                                            }
+                                        }
+                                    )
+                                } else {
+                                    Text("🏆 Aquí van los resultados reales: Ganó el Impostor", color = Color.Green)
                                 }
 
                             } else {

@@ -6,12 +6,14 @@ import com.pura.caspa.R
 import com.pura.caspa.data.model.PartyData
 import com.pura.caspa.data.util.Resource
 import com.pura.caspa.data.util.UiText
+import com.pura.caspa.domain.repository.AdProvider
 import com.pura.caspa.domain.usecase.GetInstallationIdUseCase
 import com.pura.caspa.domain.usecase.GetPartyDataUseCase
 import com.pura.caspa.domain.usecase.GetUserNameUseCase
 import com.pura.caspa.domain.usecase.ResetPlayersVotesUseCase
 import com.pura.caspa.domain.usecase.RevealImpostorUseCase
 import com.pura.caspa.domain.usecase.SharePartyIDUseCase
+import com.pura.caspa.domain.usecase.ShowRewardedAdUseCase
 import com.pura.caspa.domain.usecase.StartGameUseCase
 import com.pura.caspa.domain.usecase.UpdateToVotingUseCase
 import com.pura.caspa.domain.usecase.VoteForPlayerUseCase
@@ -36,7 +38,9 @@ class PuraCaspaGameViewModel @Inject constructor(
     private val updateToVotingUseCase: UpdateToVotingUseCase,
     private val voteForPlayerUseCase: VoteForPlayerUseCase,
     private val revealImpostorUseCase: RevealImpostorUseCase,
-    private val resetPlayersVotesUseCase: ResetPlayersVotesUseCase
+    private val resetPlayersVotesUseCase: ResetPlayersVotesUseCase,
+    private val showRewardedAdUseCase: ShowRewardedAdUseCase,
+    private val adProvider: AdProvider,
 ) : ViewModel() {
 
     private var lastWord = ""
@@ -61,6 +65,7 @@ class PuraCaspaGameViewModel @Inject constructor(
     init {
         loadMyInstallationId()
         loadUserName()
+        adProvider.loadAd()
     }
 
     private fun loadMyInstallationId() {
@@ -114,6 +119,7 @@ class PuraCaspaGameViewModel @Inject constructor(
                             ?: UiText.StringResource(R.string.unknown_error)
 
                         _partyData.value = Resource.Error(message = finalMessage)
+                        _isChangingWord.value = false
                     }
                     is Resource.Success -> {
                     }
@@ -200,4 +206,10 @@ class PuraCaspaGameViewModel @Inject constructor(
             "$actuales / $total"
         } else "0 / 0"
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "0 / 0")
+
+    fun onShowResultsClicked(onComplete: (Boolean) -> Unit) {
+        showRewardedAdUseCase { earned ->
+            onComplete(earned)
+        }
+    }
 }
