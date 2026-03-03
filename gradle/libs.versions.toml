@@ -20,7 +20,7 @@ hilt = "2.51.1"
 googleServices = "4.4.2"
 navigationCompose = "2.9.6"
 firebaseInstallations = "17.2.0"
-playServicesAds = "23.3.0"
+playServicesAds = "24.0.0"
 
 
 [libraries]

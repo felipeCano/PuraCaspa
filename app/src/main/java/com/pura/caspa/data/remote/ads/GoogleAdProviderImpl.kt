@@ -37,9 +37,7 @@ class GoogleAdProviderImpl @Inject constructor(
             })
     }
 
-    override fun showRewardedAd(onAdDismissed: (Boolean) -> Unit) {
-        val activity = context.findActivity()
-
+    override fun showRewardedAd(activity: Activity,onAdDismissed: (Boolean) -> Unit) {
         if (rewardedAd == null || activity == null) {
             Log.e("ADS_DEBUG", "No hay anuncio listo o no se encontró la Activity")
             loadAd()
@@ -66,14 +64,5 @@ class GoogleAdProviderImpl @Inject constructor(
             val type = rewardItem.type
             Log.d("ADS_DEBUG", "Recompensa ganada: $amount $type")
         }
-    }
-
-    private fun Context.findActivity(): Activity? {
-        var context = this
-        while (context is ContextWrapper) {
-            if (context is Activity) return context
-            context = context.baseContext
-        }
-        return null
     }
 }

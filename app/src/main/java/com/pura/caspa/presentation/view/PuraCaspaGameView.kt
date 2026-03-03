@@ -2,6 +2,9 @@ package com.pura.caspa.presentation.view
 
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,6 +47,7 @@ import com.pura.caspa.compose.UserRow
 import com.pura.caspa.data.util.Resource
 import com.pura.caspa.presentation.viewmodel.PuraCaspaGameViewModel
 import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.graphics.graphicsLayer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -269,19 +273,53 @@ fun PuraCaspaGameView(
                                         text = if (isAdLoading) "CARGANDO VIDEO..." else "VER RESULTADOS (VIDEO)",
                                         enabled = !isAdLoading,
                                         onClick = {
+                                            val activity = context as? android.app.Activity
                                             isAdLoading = true
-                                            viewModel.onShowResultsClicked { earned ->
+                                            viewModel.onShowResultsClicked(activity!!) { earned ->
                                                 isAdLoading = false
                                                 if (earned) {
                                                     showResults = true
                                                 } else {
-                                                    Toast.makeText(context, "El video no está listo, intenta en un momento", Toast.LENGTH_SHORT).show()
+                                                    Toast.makeText(
+                                                        context,
+                                                        "El video no está listo, intenta en un momento",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
                                                 }
                                             }
                                         }
                                     )
                                 } else {
-                                    Text("🏆 Aquí van los resultados reales: Ganó el Impostor", color = Color.Green)
+                                    var winnerGame =
+                                        partyData.integrantes.minByOrNull { integrante -> integrante.votes }
+                                    var visible by remember { mutableStateOf(false) }
+
+                                    // Configuración de la escala con rebote
+                                    val scale by animateFloatAsState(
+                                        targetValue = if (visible) 1.2f else 0f,
+                                        animationSpec = spring(
+                                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                                            stiffness = Spring.StiffnessLow
+                                        )
+                                    )
+
+                                    LaunchedEffect(Unit) { visible = true }
+
+                                    Box(
+                                        contentAlignment = Alignment.Center,
+                                        modifier = Modifier.fillMaxSize()
+                                    ) {
+                                        Text(
+                                            "🏆 El ganador es ${winnerGame?.name} con ${winnerGame?.votes} votos!",
+                                            style = MaterialTheme.typography.displayLarge,
+                                            modifier = Modifier.graphicsLayer(
+                                                scaleX = scale,
+                                                scaleY = scale
+                                            )
+                                        )
+
+                                    }
+
                                 }
 
                             } else {

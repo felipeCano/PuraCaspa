@@ -21,7 +21,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        
         // 2. Inicializar el SDK
         MobileAds.initialize(this) { status ->
             Log.d("ADS_DEBUG", "SDK Inicializado: $status")

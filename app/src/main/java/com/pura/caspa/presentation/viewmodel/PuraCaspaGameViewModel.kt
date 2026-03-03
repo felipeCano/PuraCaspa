@@ -207,8 +207,8 @@ class PuraCaspaGameViewModel @Inject constructor(
         } else "0 / 0"
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "0 / 0")
 
-    fun onShowResultsClicked(onComplete: (Boolean) -> Unit) {
-        showRewardedAdUseCase { earned ->
+    fun onShowResultsClicked(activity: android.app.Activity,onComplete: (Boolean) -> Unit) {
+        showRewardedAdUseCase(activity) { earned ->
             onComplete(earned)
         }
     }

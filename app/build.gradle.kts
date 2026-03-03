@@ -1,11 +1,9 @@
 import java.util.Properties
-import java.io.FileInputStream
 
-// Cargar las propiedades aquí arriba
 val secretProperties = Properties().apply {
     val file = rootProject.file("local.properties")
     if (file.exists()) {
-        file.inputStream().use { load(it) } // .use cierra el stream automáticamente
+        file.inputStream().use { load(it) }
     }
 }
 plugins {
@@ -68,6 +66,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    //implementation(libs.ads.mobile.sdk)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
