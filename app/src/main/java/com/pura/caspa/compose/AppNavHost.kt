@@ -93,8 +93,13 @@ fun AppNavHost(
             )
         ){
             PuraCaspaGameView(
-                modifier,
-                nameTable = it.arguments?.getString("name_table") ?: ""
+                modifier = modifier,
+                nameTable = it.arguments?.getString("name_table") ?: "",
+                onReturnToHome = {
+                    navController.navigate("create_or_join_table") {
+                        popUpTo("create_or_join_table") { inclusive = true }
+                    }
+                }
             )
         }
 
