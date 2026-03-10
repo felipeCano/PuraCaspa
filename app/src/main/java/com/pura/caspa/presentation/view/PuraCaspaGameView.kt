@@ -287,7 +287,9 @@ fun PuraCaspaGameView(
                                                     ).show()
                                                 }
                                             }
-                                        }
+                                        }, modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(64.dp)
                                     )
                                 } else {
                                     val winners = remember(partyData.integrantes) {
@@ -295,15 +297,16 @@ fun PuraCaspaGameView(
                                     }
 
                                     Column(modifier = Modifier.fillMaxSize()) {
+                                        HeaderSection()
                                         LazyColumn(
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .weight(1f),
-                                            contentPadding = PaddingValues(16.dp),
+                                            contentPadding = PaddingValues(bottom = 80.dp),
                                             verticalArrangement = Arrangement.spacedBy(10.dp)
                                         ) {
                                             item {
-                                                HeaderSection()
+
                                             }
 
                                             itemsIndexed(winners) { index, player ->
@@ -312,16 +315,6 @@ fun PuraCaspaGameView(
                                                     position = index + 1
                                                 )
                                             }
-                                        }
-
-                                        Spacer(modifier = Modifier.height(16.dp))
-
-                                        PuraCaspaButton(
-                                            text = "Volver a jugar",
-                                            enabled = true,
-                                            modifier = Modifier.fillMaxWidth()
-                                        ) {
-                                            onReturnToHome()
                                         }
                                     }
                                 }
@@ -359,6 +352,18 @@ fun PuraCaspaGameView(
                             }
                         }
                         Spacer(modifier = Modifier.weight(0.2f))
+
+                        if (partyData!!.stateParty == "gameOver") {
+                            PuraCaspaButton(
+                                text = "Volver a jugar",
+                                enabled = true,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(64.dp)
+                            ) {
+                                onReturnToHome()
+                            }
+                        }
                         if (isHost) {
                             if (partyData?.stateParty == "waiting") {
                                 Column {

@@ -104,7 +104,7 @@ fun HeaderSection() {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "¡RONDA FINALIZADA!",
+            text = "¡JUEGO FINALIZADO!",
             style = TextStyle(
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Black,
