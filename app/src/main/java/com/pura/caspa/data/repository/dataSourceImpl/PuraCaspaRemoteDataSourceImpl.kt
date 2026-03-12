@@ -166,7 +166,7 @@ class PuraCaspaRemoteDataSourceImpl(
     }
 
     //Voting
-    override suspend fun voteForPlayer(roomId: String, playerVotedId: String): Resource<Unit> {
+    override suspend fun voteForPlayer(roomId: String, playerVotedId: String, voterId: String): Resource<Unit> {
         return try {
             val roomRef = db.collection("salas").document(roomId)
 
@@ -175,11 +175,26 @@ class PuraCaspaRemoteDataSourceImpl(
                 val partyData = snapshot.toObject(PartyData::class.java)
                 val integrantes = partyData?.integrantes?.toMutableList() ?: mutableListOf()
                 val currentRoundVotes = partyData?.votos_en_esta_ronda ?: 0
+
+                // 1. Buscamos al votante para ver si ya votó (Seguridad extra en servidor)
+                val voter = integrantes.find { it.id == voterId }
+                if (voter?.hasVoted == true) {
+                    throw Exception("Ya has emitido tu voto en esta ronda")
+                }
+
+                // 2. Buscamos al jugador que recibe el voto
                 val playerToUpdate = integrantes.find { it.id == playerVotedId }
 
-                if (playerToUpdate != null) {
-                    val index = integrantes.indexOf(playerToUpdate)
-                    integrantes[index] = playerToUpdate.copy(votes = playerToUpdate.votes + 1)
+                if (playerToUpdate != null && voter != null) {
+                    val indexVoted = integrantes.indexOf(playerToUpdate)
+                    val indexVoter = integrantes.indexOf(voter)
+
+                    // Actualizamos los votos del elegido
+                    integrantes[indexVoted] = playerToUpdate.copy(votes = playerToUpdate.votes + 1)
+
+                    // Marcamos al votante como "ya votó"
+                    integrantes[indexVoter] = integrantes[indexVoter].copy(hasVoted = true)
+
                     transaction.update(roomRef, "integrantes", integrantes)
                     transaction.update(roomRef, "votos_en_esta_ronda", currentRoundVotes + 1)
                 }
@@ -211,14 +226,24 @@ class PuraCaspaRemoteDataSourceImpl(
     //ResetVotin
     override suspend fun resetPlayersVotes(roomId: String): Resource<Unit> {
         return try {
-            db.collection("salas").document(roomId)
-                .update("votos_en_esta_ronda", 0).await()
+            val roomRef = db.collection("salas").document(roomId)
+
+            db.runTransaction { transaction ->
+                val snapshot = transaction.get(roomRef)
+                val partyData = snapshot.toObject(PartyData::class.java)
+                val integrantes = partyData?.integrantes?.map { player ->
+                    player.copy(votes = 0, hasVoted = false) // Limpiamos ambos campos
+                } ?: emptyList()
+
+                transaction.update(roomRef, "integrantes", integrantes)
+                transaction.update(roomRef, "votos_en_esta_ronda", 0)
+            }.await()
+
             Resource.Success(Unit)
         } catch (e: Exception) {
             val errorEnum = if (e.localizedMessage == null) PartyError.FIREBASE_ERROR else null
             val dynamicMsg = e.localizedMessage?.let { UiText.DynamicString(it) }
             Resource.Error(errorEnum, dynamicMsg)
-            //Resource.Error(e.localizedMessage ?: "Error al reiniciar contador de ronda")
         }
     }
 }

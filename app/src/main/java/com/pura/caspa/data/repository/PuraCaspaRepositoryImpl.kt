@@ -85,8 +85,8 @@ class PuraCaspaRepositoryImpl(
     }
 
     //Voting
-    override suspend fun voteForPlayer(roomId: String, playerVotedId: String): Resource<Unit> {
-        return puraCaspaRemoteDataSource.voteForPlayer(roomId, playerVotedId)
+    override suspend fun voteForPlayer(roomId: String, playerVotedId: String, voterId: String): Resource<Unit> {
+        return puraCaspaRemoteDataSource.voteForPlayer(roomId, playerVotedId, voterId)
     }
 
     //Reveal Imposter

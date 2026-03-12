@@ -84,8 +84,17 @@ class PuraCaspaGameViewModel @Inject constructor(
         viewModelScope.launch {
             getPartyDataUseCase(roomId).collect { result ->
                 _partyData.value = result
-                if (result is Resource.Success && result.data?.palabra_actual != lastWord) {
-                    _isChangingWord.value = false
+                if (result is Resource.Success) {
+                    val data = result.data
+
+                    val meEnLaLista = data?.integrantes?.find { it.id == _myId.value }
+                    if (meEnLaLista != null) {
+                        _hasVoted.value = meEnLaLista.hasVoted
+                    }
+
+                    if (data?.palabra_actual != lastWord) {
+                        _isChangingWord.value = false
+                    }
                 }
             }
         }
@@ -164,12 +173,12 @@ class PuraCaspaGameViewModel @Inject constructor(
         if (_hasVoted.value) return
 
         viewModelScope.launch {
-            _hasVoted.value = true
+            val myPlayerId = _myId.value
 
-            val result = voteForPlayerUseCase(roomId, playerVotedId)
+            val result = voteForPlayerUseCase(roomId, playerVotedId, myPlayerId)
 
             if (result is Resource.Error) {
-                _hasVoted.value = false
+                _hasVoted.value = true
             }
         }
     }

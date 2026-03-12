@@ -6,7 +6,7 @@ import com.pura.caspa.domain.repository.PuraCaspaRepository
 class VoteForPlayerUseCase (
     private val repository: PuraCaspaRepository
 ) {
-    suspend operator fun invoke(roomId: String, playerVotedId: String): Resource<Unit> {
-        return repository.voteForPlayer(roomId, playerVotedId)
+    suspend operator fun invoke(roomId: String, playerVotedId: String, voterId: String): Resource<Unit> {
+        return repository.voteForPlayer(roomId, playerVotedId, voterId)
     }
 }
