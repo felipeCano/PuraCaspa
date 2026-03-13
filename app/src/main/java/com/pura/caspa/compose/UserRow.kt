@@ -24,9 +24,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 @Composable
 fun UserRow(name: String, isSelected: Boolean) {
-    val backgroundColor = if (isSelected) Color.Black else Color.Transparent
-    val contentColor = if (isSelected) Color.White else Color.Black
-    val borderColor = Color.Black
+    val backgroundColor = if (isSelected) {
+        MaterialTheme.colorScheme.primary
+    } else {
+        Color.Transparent
+    }
+
+    val contentColor = if (isSelected) {
+        MaterialTheme.colorScheme.onPrimary
+    } else {
+        MaterialTheme.colorScheme.onSurface
+    }
+
+    val borderColor = MaterialTheme.colorScheme.outline
 
     Surface(
         modifier = Modifier

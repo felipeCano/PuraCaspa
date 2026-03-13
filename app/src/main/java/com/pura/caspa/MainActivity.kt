@@ -1,6 +1,7 @@
 package com.pura.caspa
 
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -25,6 +26,7 @@ class MainActivity : ComponentActivity() {
         MobileAds.initialize(this) { status ->
             Log.d("ADS_DEBUG", "SDK Inicializado: $status")
         }
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         setContent {
             PuraCaspaTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
