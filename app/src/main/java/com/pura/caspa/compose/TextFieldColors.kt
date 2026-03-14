@@ -1,5 +1,6 @@
 package com.pura.caspa.compose
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -8,11 +9,12 @@ import com.pura.caspa.R
 
 @Composable
 fun textFieldColors() = TextFieldDefaults.colors(
-    focusedContainerColor = colorResource(id = R.color.input_background),
-    unfocusedContainerColor = colorResource(id = R.color.input_background),
-    disabledContainerColor = colorResource(id = R.color.input_background),
+    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+    cursorColor = MaterialTheme.colorScheme.primary,
     focusedIndicatorColor = Color.Transparent,
     unfocusedIndicatorColor = Color.Transparent,
-    focusedTextColor = Color.White,
-    unfocusedTextColor = Color.White
+    disabledIndicatorColor = Color.Transparent
 )
