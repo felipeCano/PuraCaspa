@@ -19,10 +19,13 @@ import com.pura.caspa.domain.usecase.UpdateToVotingUseCase
 import com.pura.caspa.domain.usecase.VoteForPlayerUseCase
 import com.pura.caspa.presentation.util.toUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -62,6 +65,14 @@ class PuraCaspaGameViewModel @Inject constructor(
     private val _isChangingWord = MutableStateFlow(false)
     val isChangingWord = _isChangingWord.asStateFlow()
 
+    private var timerJob: Job? = null
+    private val _remainingTime = MutableStateFlow(30)
+    val remainingTime: StateFlow<Int> = _remainingTime.asStateFlow()
+
+    //Variable to know if the time expired
+    private val _isTimerFinished = MutableStateFlow(false)
+    val isTimerFinished: StateFlow<Boolean> = _isTimerFinished.asStateFlow()
+
     init {
         loadMyInstallationId()
         loadUserName()
@@ -86,6 +97,12 @@ class PuraCaspaGameViewModel @Inject constructor(
                 _partyData.value = result
                 if (result is Resource.Success) {
                     val data = result.data
+
+                    if (data?.stateParty == "voting" && timerJob == null) {
+                        startVotingTimer()
+                    } else if (data?.stateParty != "voting") {
+                        stopVotingTimer()
+                    }
 
                     val meEnLaLista = data?.integrantes?.find { it.id == _myId.value }
                     if (meEnLaLista != null) {
@@ -221,4 +238,39 @@ class PuraCaspaGameViewModel @Inject constructor(
             onComplete(earned)
         }
     }
+
+    private fun startVotingTimer() {
+        _isTimerFinished.value = false
+        _remainingTime.value = 30
+        timerJob?.cancel()
+        timerJob = viewModelScope.launch {
+            while (_remainingTime.value > 0) {
+                delay(1000)
+                _remainingTime.value -= 1
+            }
+            _isTimerFinished.value = true
+        }
+    }
+
+    private fun stopVotingTimer() {
+        timerJob?.cancel()
+        timerJob = null
+        _remainingTime.value = 30
+        _isTimerFinished.value = false
+    }
+
+    //We modified the validation to be: (Voting complete) OR (Time expired)
+    val canHostMoveForward: StateFlow<Boolean> = combine(
+        _partyData,
+        _isTimerFinished
+    ) { resource, timerDone ->
+        if (resource is Resource.Success) {
+            val data = resource.data
+            val integrantesCount = data?.integrantes?.size ?: 0
+            val votosCount = data?.votos_en_esta_ronda ?: 0
+
+            //Available if: all voted OR timer finished
+            (votosCount >= integrantesCount && integrantesCount > 0) || timerDone
+        } else false
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 }

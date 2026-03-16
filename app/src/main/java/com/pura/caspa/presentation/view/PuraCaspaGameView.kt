@@ -68,6 +68,8 @@ fun PuraCaspaGameView(
     val isChangingWord by viewModel.isChangingWord.collectAsState()
     var showResults by remember { mutableStateOf(false) }
     var isAdLoading by remember { mutableStateOf(false) }
+    val remainingTime by viewModel.remainingTime.collectAsState()
+    val canMoveForward by viewModel.canHostMoveForward.collectAsState()
 
     LaunchedEffect(key1 = nameTable) {
         viewModel.listenToRoom(nameTable)
@@ -189,6 +191,14 @@ fun PuraCaspaGameView(
                                         verticalArrangement = Arrangement.spacedBy(12.dp),
                                         contentPadding = PaddingValues(vertical = 16.dp)
                                     ) {
+                                        item {
+                                            Text(
+                                                text = if (remainingTime > 0) "Tiempo de votacion restante: $remainingTime s" else "¡Tiempo agotado!",
+                                                color = if (remainingTime <= 5) Color.Red else Color.Gray,
+                                                fontWeight = FontWeight.Bold,
+                                                modifier = Modifier.padding(bottom = 8.dp)
+                                            )
+                                        }
                                         items(
                                             items = integrantes,
                                             { player -> player.id }
@@ -382,7 +392,7 @@ fun PuraCaspaGameView(
                                     PuraCaspaButton(
                                         text = "MOSTRAR IMPOSTOR",
                                         onClick = { viewModel.onRevealImpostorClicked(nameTable) },
-                                        enabled = isVotingComplete,
+                                        enabled = canMoveForward,
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .height(64.dp)
@@ -409,7 +419,7 @@ fun PuraCaspaGameView(
                                 },
                                 enabled = integrantes.size >= 2 && (
                                         partyData.stateParty == "waiting" || // Permitir si apenas van a empezar
-                                                (partyData.stateParty == "voting" && isVotingComplete)),
+                                                (partyData.stateParty == "voting" && canMoveForward)),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(64.dp),
