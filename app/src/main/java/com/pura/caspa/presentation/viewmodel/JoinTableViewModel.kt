@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.pura.caspa.R
 import com.pura.caspa.data.util.Resource
 import com.pura.caspa.data.util.UiText
+import com.pura.caspa.domain.repository.AdProvider
 import com.pura.caspa.domain.repository.PuraCaspaRepository
 import com.pura.caspa.domain.usecase.GetUserNameUseCase
 import com.pura.caspa.domain.usecase.JoinPartyUseCase
@@ -22,7 +23,8 @@ class JoinTableViewModel @Inject constructor(
     private val joinPartyUseCase: JoinPartyUseCase,
     private val getUserNameUseCase: GetUserNameUseCase,
     private val saveUserNameUseCase: SaveUserNameUseCase,
-    private val repository: PuraCaspaRepository
+    private val repository: PuraCaspaRepository,
+    private val adProvider: AdProvider
 ) : ViewModel() {
 
     private val _joinState = MutableStateFlow<Resource<Unit>?>(null)
@@ -34,7 +36,10 @@ class JoinTableViewModel @Inject constructor(
     private val _nameState = MutableStateFlow(repository.getUserName())
     val nameState: StateFlow<String> = _nameState.asStateFlow()
 
+    val bannerAdUnitId: String = adProvider.getBannerAdUnitId()
+
     init {
+        adProvider.loadAd()
         getName()
     }
 

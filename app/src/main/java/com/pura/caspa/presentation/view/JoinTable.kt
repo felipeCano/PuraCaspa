@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
@@ -30,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.pura.caspa.R
+import com.pura.caspa.compose.AdmobBanner
 import com.pura.caspa.compose.PuraCaspaButton
 import com.pura.caspa.compose.TitleFrame
 import com.pura.caspa.compose.textFieldColors
@@ -59,14 +61,21 @@ fun JoinTable(
         viewModel.getName()
     }
 
-    TitleFrame(stringResource(R.string.join_the_room)) {
+    TitleFrame(stringResource(R.string.join_the_room)) {paddongValues ->
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
+                .padding(paddongValues)
         ) {
+            AdmobBanner(
+                adUnitId = viewModel.bannerAdUnitId,
+                modifier = Modifier
+                    .fillMaxWidth().align(Alignment.TopCenter).padding(top = 10.dp)
+            )
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .offset(y = (-50).dp)
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
