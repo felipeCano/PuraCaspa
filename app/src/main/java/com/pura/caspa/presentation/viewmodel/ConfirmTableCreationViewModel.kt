@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.pura.caspa.R
 import com.pura.caspa.data.util.Resource
 import com.pura.caspa.data.util.UiText
+import com.pura.caspa.domain.repository.AdProvider
 import com.pura.caspa.domain.usecase.CreatePartyUseCase
 import com.pura.caspa.presentation.util.toUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,11 +16,17 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ConfirmTableCreationViewModel @Inject constructor(
-    private val createPartyUseCase: CreatePartyUseCase
+    private val createPartyUseCase: CreatePartyUseCase,
+    private val adProvider: AdProvider
 ) : ViewModel() {
     private val _createPartyState = MutableStateFlow<Resource<Unit>?>(null)
     val createPartyState = _createPartyState.asStateFlow()
 
+    val bannerAdUnitId: String = adProvider.getBannerAdUnitId()
+
+    init {
+        adProvider.loadAd()
+    }
     fun createNewRoom(roomName: String) {
         _createPartyState.value = Resource.Loading()
         if (roomName.isBlank()) {
