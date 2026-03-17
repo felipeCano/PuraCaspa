@@ -45,6 +45,7 @@ import com.pura.caspa.presentation.viewmodel.PuraCaspaGameViewModel
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.ui.Alignment
+import com.pura.caspa.compose.AdmobBanner
 import com.pura.caspa.compose.HeaderSection
 import com.pura.caspa.compose.RacerResultRow
 
@@ -104,12 +105,19 @@ fun PuraCaspaGameView(
 
     TitleFrame(stringResource(R.string.party), nameTable) { paddingValues ->
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 20.dp, vertical = 24.dp),
+                .padding(horizontal = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.height(10.dp))
+            AdmobBanner(
+                adUnitId = viewModel.bannerAdUnitId,
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(24.dp))
             if (isChangingWord) {
                 CircularProgressIndicator()
             } else {

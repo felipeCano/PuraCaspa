@@ -2,7 +2,6 @@ package com.pura.caspa.data.remote.ads
 
 import android.app.Activity
 import android.content.Context
-import android.content.ContextWrapper
 import android.util.Log
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
@@ -64,5 +63,9 @@ class GoogleAdProviderImpl @Inject constructor(
             val type = rewardItem.type
             Log.d("ADS_DEBUG", "Recompensa ganada: $amount $type")
         }
+    }
+
+    override fun getBannerAdUnitId(): String {
+        return BuildConfig.ADMOB_BANNER_UNIT_ID
     }
 }

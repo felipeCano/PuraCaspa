@@ -29,9 +29,11 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         val appId = secretProperties.getProperty("ADMOB_APP_ID") ?: ""
         val adUnitId = secretProperties.getProperty("ADMOB_REWARDED_UNIT_ID") ?: ""
+        val adBannerUnitId = secretProperties.getProperty("ADMOB_BANNER_UNIT_ID") ?: ""
 
         manifestPlaceholders["ADMOB_APP_ID"] = appId
         buildConfigField("String", "ADMOB_REWARDED_UNIT_ID", "\"$adUnitId\"")
+        buildConfigField("String", "ADMOB_BANNER_UNIT_ID", "\"$adBannerUnitId\"")
     }
 
     buildTypes {

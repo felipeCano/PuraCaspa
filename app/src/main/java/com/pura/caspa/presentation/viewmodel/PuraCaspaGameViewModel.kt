@@ -73,6 +73,8 @@ class PuraCaspaGameViewModel @Inject constructor(
     private val _isTimerFinished = MutableStateFlow(false)
     val isTimerFinished: StateFlow<Boolean> = _isTimerFinished.asStateFlow()
 
+    val bannerAdUnitId: String = adProvider.getBannerAdUnitId()
+
     init {
         loadMyInstallationId()
         loadUserName()

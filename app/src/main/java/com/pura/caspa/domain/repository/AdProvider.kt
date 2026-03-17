@@ -5,4 +5,5 @@ import android.app.Activity
 interface AdProvider {
     fun loadAd()
     fun showRewardedAd(activity: Activity, onAdDismissed: (Boolean) -> Unit)
+    fun getBannerAdUnitId(): String
 }
